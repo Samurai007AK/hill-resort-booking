@@ -17,6 +17,26 @@ export const displayDate = (date: string) =>
     timeZone: "UTC",
   }).format(new Date(`${date}T00:00:00Z`));
 
+const plural = (count: number, one: string, many: string) => `${count} ${count === 1 ? one : many}`;
+
+/** "2 adults, 1 child, 1 room" */
+export function party({
+  adults,
+  children,
+  qty,
+}: {
+  adults: number;
+  children: number;
+  qty?: number;
+}): string {
+  const parts = [plural(adults, "adult", "adults"), plural(children, "child", "children")];
+  if (qty !== undefined) parts.push(plural(qty, "room", "rooms"));
+  return parts.join(", ");
+}
+
+export const stayDates = (checkIn: string, checkOut: string) =>
+  `${displayDate(checkIn)} to ${displayDate(checkOut)}`;
+
 export function searchQuery(search: Search): string {
   const query = new URLSearchParams({
     in: search.checkIn,
@@ -32,14 +52,16 @@ export function searchQuery(search: Search): string {
 export function GuestHeader() {
   return (
     <header className="site-header">
-      <Link href="/" className="brand">
-        SILVER OAKS<span>COFFEE ESTATE · CHIKKAMAGALURU</span>
-      </Link>
-      <nav aria-label="Main navigation">
-        <Link href="/#stays">Stay</Link>
-        <Link href="/enquire">Gather</Link>
-        <Link href="/login">Sign in</Link>
-      </nav>
+      <div className="container site-header-inner">
+        <Link href="/" className="wordmark" aria-label="Silver Oaks, home">
+          Silver Oaks<span>Coffee estate, Chikkamagaluru</span>
+        </Link>
+        <nav className="site-nav" aria-label="Main navigation">
+          <Link href="/#stays">Stay</Link>
+          <Link href="/enquire">Gather</Link>
+          <Link href="/login">Sign in</Link>
+        </nav>
+      </div>
     </header>
   );
 }
@@ -47,23 +69,39 @@ export function GuestHeader() {
 export function GuestFooter() {
   return (
     <footer className="site-footer">
-      <div>
-        <strong>Silver Oaks</strong>
-        <p>A little closer to the hills.</p>
+      <div className="container site-footer-inner">
+        <div>
+          <Link href="/" className="wordmark">
+            Silver Oaks
+          </Link>
+          <p>A little closer to the hills.</p>
+        </div>
+        <nav className="footer-links" aria-label="Footer">
+          <Link href="/enquire">Plan a gathering</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/login">Team sign in</Link>
+        </nav>
+        <small className="footer-legal">A demonstration resort. Payments are simulated.</small>
       </div>
-      <div>
-        <Link href="/enquire">Plan a gathering</Link>
-        <Link href="/privacy">Privacy</Link>
-        <Link href="/login">Team sign in</Link>
-      </div>
-      <small>A demonstration resort. Payments are simulated.</small>
     </footer>
   );
 }
 
-export function SearchForm({ search, action = "/" }: { search: Search; action?: string }) {
+export function SearchForm({
+  search,
+  action = "/",
+  stacked = false,
+}: {
+  search: Search;
+  action?: string;
+  stacked?: boolean;
+}) {
   return (
-    <form action={action} className="search-form" aria-label="Find your stay">
+    <form
+      action={action}
+      className={stacked ? "search-form stacked" : "search-form"}
+      aria-label="Find your stay"
+    >
       <label>
         Check-in
         <input type="date" name="in" min={todayIST()} defaultValue={search.checkIn} required />
@@ -93,7 +131,7 @@ export function SearchForm({ search, action = "/" }: { search: Search; action?: 
       </label>
       {search.promo && <input type="hidden" name="promo" value={search.promo} />}
       <button className="button" type="submit">
-        Find a stay <span aria-hidden="true">↗</span>
+        Find a stay
       </button>
     </form>
   );
@@ -104,26 +142,31 @@ export function PriceBreakdown({ quote, qty }: { quote: Quote; qty: number }) {
     <div className="price-breakdown">
       <div className="table-scroll">
         <table>
-          <caption>
-            Per-night price · {qty} {qty === 1 ? "room" : "rooms"}
-          </caption>
+          <caption>Price per night for {plural(qty, "room", "rooms")}, GST shown per night</caption>
           <thead>
             <tr>
-              <th>Night</th>
-              <th>After discount</th>
-              <th>GST</th>
-              <th>Total</th>
+              <th scope="col">Night</th>
+              <th scope="col" className="amount">
+                After discount
+              </th>
+              <th scope="col" className="amount">
+                GST
+              </th>
+              <th scope="col" className="amount">
+                Total
+              </th>
             </tr>
           </thead>
           <tbody>
             {quote.lines.map((line) => (
               <tr key={line.date}>
                 <td>{displayDate(line.date)}</td>
-                <td>{money(line.taxable)}</td>
-                <td>
-                  {line.gstRate}% · {money(line.gst)}
+                <td className="amount">{money(line.taxable)}</td>
+                <td className="amount">
+                  {money(line.gst)}
+                  <span className="gst-rate">at {line.gstRate}%</span>
                 </td>
-                <td>{money(line.total)}</td>
+                <td className="amount">{money(line.total)}</td>
               </tr>
             ))}
           </tbody>
@@ -156,16 +199,18 @@ export function PriceBreakdown({ quote, qty }: { quote: Quote; qty: number }) {
   );
 }
 
+const STEPS = ["Choose your stay", "Your details", "Test payment"];
+
 export function Stepper({ step }: { step: 1 | 2 | 3 }) {
   return (
     <ol className="booking-steps" aria-label="Booking progress">
-      {["Choose your stay", "Your details", "Test payment"].map((label, index) => (
+      {STEPS.map((label, index) => (
         <li
           key={label}
-          className={index + 1 === step ? "active" : ""}
+          className={index + 1 === step ? "active" : index + 1 < step ? "done" : ""}
           aria-current={index + 1 === step ? "step" : undefined}
         >
-          <span>{index + 1}</span>
+          <span className="step-number">{index + 1}</span>
           {label}
         </li>
       ))}
@@ -175,7 +220,7 @@ export function Stepper({ step }: { step: 1 | 2 | 3 }) {
 
 export function GuestError({ title = "We couldn’t load this just now." }: { title?: string }) {
   return (
-    <section className="card stack" role="alert">
+    <section className="notice stack" role="alert">
       <h2>{title}</h2>
       <p>
         Please try again in a moment. Your booking is only confirmed after a successful test
