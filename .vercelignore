@@ -1,0 +1,9 @@
+.pgdata
+.claude
+.env*
+!.env.example
+output
+coverage
+.metrics
+.next
+node_modules
