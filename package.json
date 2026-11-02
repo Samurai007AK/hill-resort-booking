@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest --run",
     "eval": "tsx scripts/eval.ts",
+    "eval:live": "node --env-file-if-exists=.env.local --import tsx scripts/eval-live.ts",
     "db:start": "tsx scripts/dev-db.ts",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
