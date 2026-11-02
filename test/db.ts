@@ -1,11 +1,17 @@
 // Shared helpers for tests that hit the real test database. Importing this file
-// closes the pool after the file's tests.
+// closes the pool after the file's tests and audits for overbooking after each test.
 import { randomUUID } from "node:crypto";
 import type { ClientBase, Pool } from "pg";
-import { afterAll } from "vitest";
+import { afterAll, afterEach, expect } from "vitest";
 import { pool } from "@/db/pool";
 
 export { pool };
+
+// The overbooking audit: after every DB test, no night anywhere may be over its allotment.
+afterEach(async () => {
+  const { rows } = await pool.query("SELECT * FROM night_usage WHERE active > allotment_effective");
+  expect(rows).toEqual([]);
+});
 
 afterAll(() => pool.end());
 
