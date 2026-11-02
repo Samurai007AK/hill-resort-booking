@@ -21,7 +21,8 @@ export const AiResponse = z.strictObject({
   category: Category,
   confidence: z.number().min(0).max(1),
   extracted: Extraction,
-  reply_template: z.string().min(1).max(2000),
+  /** Null when the model's draft was unsafe and the standard reply is used instead. */
+  reply_template: z.string().min(1).max(2000).nullable(),
 });
 export type AiResponse = z.infer<typeof AiResponse>;
 
@@ -228,21 +229,22 @@ export function extractKeywords(text: string): Extraction {
 const numberWords =
   /\b(?:zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|lakh|crore|million|billion)\b/i;
 const SLOTS = ["TOTAL", "NIGHTLY", "GST", "DATES", "GUESTS", "AVAILABILITY"];
-function validateTemplate(template: string, ctx: z.RefinementCtx) {
+/** Why a model-written draft cannot be used, or null when it is safe. */
+function templateProblem(template: string): string | null {
+  let unknownSlot = false;
   const prose = template.replace(/\{\{([A-Z_]+)\}\}/g, (_, slot: string) => {
-    if (!SLOTS.includes(slot)) ctx.addIssue({ code: "custom", message: "Unknown draft slot" });
+    if (!SLOTS.includes(slot)) unknownSlot = true;
     return "";
   });
+  if (unknownSlot) return "Unknown draft slot";
   if (
     /[\d₹%{}]|\b(?:confirm|confirmed|confirmation|complete|booked|reserved|guaranteed|discount|percent|rupees|free|complimentary|available|cancellation|refund)\b/i.test(
       prose,
     ) ||
     numberWords.test(prose)
   )
-    ctx.addIssue({
-      code: "custom",
-      message: "Draft must use server-filled slots and contain no commercial promises",
-    });
+    return "Draft must use server-filled slots and contain no commercial promises";
+  return null;
 }
 function calendarDateValid(date: DatePart): boolean {
   if (date.day === null) return true;
@@ -253,37 +255,78 @@ function calendarDateValid(date: DatePart): boolean {
     return false;
   }
 }
-function validateExtracted(e: Extraction, text: string, ctx: z.RefinementCtx) {
+type ExtractedField = Exclude<keyof Extraction, "room_type">;
+/** Fields the model claims that the message does not support. */
+function extractionProblems(
+  e: Extraction,
+  text: string,
+): { fields: ExtractedField[]; message: string }[] {
   const values = numericValues(text);
   const present = (v: number | null) =>
-    v === null || values.includes(v) || (v === 1 && /\b(?:a|an|one)\b/i.test(text));
-  for (const value of [e.adults, e.children, e.budget_inr])
-    if (!present(value)) ctx.addIssue({ code: "custom", message: "Invented number" });
+    v === null || values.includes(v) || (v === 1 && /b(?:a|an|one)b/i.test(text));
+  const problems: { fields: ExtractedField[]; message: string }[] = [];
+  for (const field of ["adults", "children", "budget_inr"] as const)
+    if (!present(e[field])) problems.push({ fields: [field], message: "Invented number" });
   if (!present(e.guests_total) && e.guests_total !== (e.adults ?? 0) + (e.children ?? 0))
-    ctx.addIssue({ code: "custom", message: "Invented guest total" });
-  for (const date of [e.check_in, e.check_out])
-    if (date) {
-      if (
-        !calendarDateValid(date) ||
+    problems.push({ fields: ["guests_total"], message: "Invented guest total" });
+  for (const field of ["check_in", "check_out"] as const) {
+    const date = e[field];
+    if (
+      date &&
+      (!calendarDateValid(date) ||
         !present(date.day) ||
         !present(date.year) ||
         (!new RegExp(`\\b${MONTHS[date.month - 1]}`, "i").test(text) &&
-          !values.includes(date.month))
-      )
-        ctx.addIssue({ code: "custom", message: "Invented or invalid date" });
-    }
+          !values.includes(date.month)))
+    )
+      problems.push({ fields: [field], message: "Invented or invalid date" });
+  }
   if (
     e.check_in?.day &&
     e.check_out?.day &&
     !resolveDates(e.check_in, e.check_out, "2000-01-01").checkOut
   )
-    ctx.addIssue({ code: "custom", message: "Departure must be after arrival" });
+    problems.push({
+      fields: ["check_in", "check_out"],
+      message: "Departure must be after arrival",
+    });
+  return problems;
 }
+/** All-or-nothing check: true only when every part of the answer is safe as given. */
 export function validateAiResponse(raw: unknown, text: string) {
   return AiResponse.superRefine((response, ctx) => {
-    validateTemplate(response.reply_template, ctx);
-    validateExtracted(response.extracted, text, ctx);
+    const draft =
+      response.reply_template === null ? null : templateProblem(response.reply_template);
+    if (draft) ctx.addIssue({ code: "custom", message: draft });
+    for (const problem of extractionProblems(response.extracted, text))
+      ctx.addIssue({ code: "custom", message: problem.message });
   }).safeParse(raw);
+}
+
+export type Screened =
+  { ok: true; response: AiResponse; notes: string[] } | { ok: false; reason: string };
+/**
+ * Keeps a well-formed answer's category and confidence, and clears only what is unsafe:
+ * a draft that makes promises or writes numbers, and fields the message does not support.
+ * A malformed answer is refused outright.
+ */
+export function screenAiResponse(raw: unknown, text: string): Screened {
+  const parsed = AiResponse.safeParse(raw);
+  if (!parsed.success)
+    return { ok: false, reason: `malformed answer: ${parsed.error.issues[0]?.path.join(".")}` };
+  const response = structuredClone(parsed.data);
+  const notes: string[] = [];
+  const draft = response.reply_template === null ? null : templateProblem(response.reply_template);
+  if (draft) {
+    response.reply_template = null;
+    notes.push(`AI draft dropped (${draft}); the standard reply is used`);
+  }
+  for (const problem of extractionProblems(response.extracted, text))
+    for (const field of problem.fields) {
+      response.extracted[field] = null;
+      notes.push(`${field} cleared: ${problem.message.toLowerCase()}`);
+    }
+  return { ok: true, response, notes: [...new Set(notes)] };
 }
 
 type DecisionInput = {

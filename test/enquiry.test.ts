@@ -98,10 +98,7 @@ test("valid provider response is parsed; only redacted text reaches the network"
   expect(request).not.toContain("98765");
   expect(item.draft).not.toContain("{{");
 });
-test("failed model and malicious prices use a marked fallback and alert GM", async () => {
-  await setAiEnabled(true, "gm@demo.in");
-  vi.stubEnv("APINEX_API_KEY", "test_provider_key");
-  vi.stubEnv("OLLAMA_API_KEY", "");
+function stubModelReply(replyTemplate: string) {
   vi.stubGlobal(
     "fetch",
     vi.fn(
@@ -115,7 +112,7 @@ test("failed model and malicious prices use a marked fallback and alert GM", asy
                     category: "room",
                     confidence: 0.99,
                     extracted: extractKeywords(input.text),
-                    reply_template: "Confirmed for ₹1",
+                    reply_template: replyTemplate,
                   }),
                 },
               },
@@ -124,11 +121,25 @@ test("failed model and malicious prices use a marked fallback and alert GM", asy
         ),
     ),
   );
-  expect(await ingestEnquiry(input)).toMatchObject({
-    ai_status: "fallback",
-    lane: "unsorted",
-    gm_alert: true,
-  });
+}
+test("a malicious model draft is dropped: no model price reaches the reply", async () => {
+  await setAiEnabled(true, "gm@demo.in");
+  vi.stubEnv("APINEX_API_KEY", "test_provider_key");
+  vi.stubEnv("OLLAMA_API_KEY", "");
+  stubModelReply("Confirmed for ₹1");
+  const item = await ingestEnquiry({ ...input, idempotencyKey: randomUUID() });
+  expect(item.ai_status).toBe("ok");
+  expect(item.draft).not.toMatch(/₹\s*1(?![\d,])|Confirmed for/);
+  expect(item.ai_reason).toMatch(/AI draft dropped/);
+});
+test("a provider outage falls back to keywords, stays unsorted and alerts the GM", async () => {
+  await setAiEnabled(true, "gm@demo.in");
+  vi.stubEnv("APINEX_API_KEY", "test_provider_key");
+  vi.stubEnv("OLLAMA_API_KEY", "");
+  vi.stubGlobal("fetch", vi.fn(async () => new Response("busy", { status: 503 })));
+  const item = await ingestEnquiry({ ...input, idempotencyKey: randomUUID() });
+  expect(item).toMatchObject({ ai_status: "fallback", lane: "unsorted", gm_alert: true });
+  expect(item.ai_reason).toMatch(/HTTP 503/);
 });
 test("manual reroute and sent status append audit events without auto-sending", async () => {
   const initial = await getEnquiry("ENQ-4411");

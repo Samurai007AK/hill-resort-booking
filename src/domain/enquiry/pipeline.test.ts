@@ -5,6 +5,7 @@ import {
   redactPersonalData,
   decideLane,
   validateAiResponse,
+  screenAiResponse,
   resolveDates,
 } from "./pipeline";
 
@@ -167,5 +168,61 @@ describe("enquiry guardrails", () => {
         "2026-11-02",
       ),
     ).toEqual({ checkIn: "2026-12-30", checkOut: "2027-01-02", assumed: true });
+  });
+});
+
+describe("screenAiResponse keeps a sound classification and drops only the unsafe part", () => {
+  const text = "room 14-16 Nov for 2 adults";
+  const good = {
+    category: "room",
+    confidence: 0.9,
+    extracted: extractKeywords(text),
+    reply_template: "Thank you for writing to us. {{DATES}} {{TOTAL}}",
+  };
+
+  test("a clean answer passes untouched", () => {
+    const result = screenAiResponse(good, text);
+    expect(result).toMatchObject({ ok: true, notes: [] });
+    if (result.ok) expect(result.response.reply_template).toBe(good.reply_template);
+  });
+
+  test("an unsafe draft is dropped but the category is kept", () => {
+    const result = screenAiResponse(
+      { ...good, reply_template: "We confirm your reservation." },
+      text,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.response.category).toBe("room");
+    expect(result.response.reply_template).toBeNull();
+    expect(result.notes.join(" ")).toMatch(/draft/i);
+  });
+
+  test("an invented number is cleared, not trusted", () => {
+    const result = screenAiResponse(
+      { ...good, extracted: { ...good.extracted, adults: 9, guests_total: 9 } },
+      text,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.response.extracted.adults).toBeNull();
+    expect(result.notes.join(" ")).toMatch(/adults/);
+  });
+
+  test("reversed dates are cleared", () => {
+    const reversed = "room 16-14 Nov 2027 for 2 adults";
+    const result = screenAiResponse(
+      { ...good, extracted: extractKeywords(reversed), reply_template: "Thank you." },
+      reversed,
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.response.extracted.check_in).toBeNull();
+    expect(result.response.extracted.check_out).toBeNull();
+  });
+
+  test("a malformed answer is still refused", () => {
+    expect(screenAiResponse({ ...good, category: "booking" }, text).ok).toBe(false);
+    expect(screenAiResponse({ ...good, confidence: 3 }, text).ok).toBe(false);
   });
 });

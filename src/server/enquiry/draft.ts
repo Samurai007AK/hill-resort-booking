@@ -87,6 +87,8 @@ export async function makeDraft(
   db: Pick<ClientBase, "query">,
   category: keyof typeof TEMPLATES,
   extracted: Extraction,
+  /** A screened model draft with slots; the standard wording is used when absent. */
+  aiTemplate: string | null = null,
 ): Promise<string> {
   const dates = resolveDates(extracted.check_in, extracted.check_out, todayIST());
   const slots = {
@@ -99,7 +101,7 @@ export async function makeDraft(
         : "Please confirm the number of adults and children.",
     ...(await priceSlots(db, extracted, dates)),
   };
-  const template = TEMPLATES[category];
+  const template = aiTemplate ?? TEMPLATES[category];
   let draft = template.replace(/\{\{([A-Z_]+)\}\}/g, (_, slot: string) =>
     slot in slots ? slots[slot as keyof typeof slots] : "",
   );

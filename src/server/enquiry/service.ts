@@ -120,7 +120,8 @@ async function cachedClassification(text: string) {
     );
     if (rows[0]) {
       const parsed = validateAiResponse(rows[0].response, text);
-      if (parsed.success) return { ok: true as const, response: parsed.data, model, cache: true };
+      if (parsed.success)
+        return { ok: true as const, response: parsed.data, notes: [], model, cache: true };
     }
   }
   const result = await classifyWithProvider(text);
@@ -139,6 +140,8 @@ type Analysis = {
   redacted: string;
   reason: string;
   route: ReturnType<typeof decideLane>;
+  /** The model's own wording, used only when it passed screening and agrees with the route. */
+  draftTemplate: string | null;
 };
 async function analyse(text: string, sender: string): Promise<Analysis> {
   const redacted = redactPersonalData(text, sender);
@@ -150,21 +153,21 @@ async function analyse(text: string, sender: string): Promise<Analysis> {
   const status = !enabled ? "off" : result.ok ? "ok" : "fallback";
   const response = result.ok ? result.response : null;
   const extracted = response?.extracted ?? extractKeywords(redacted);
-  const route = decideLane({
-    keyword,
-    extracted,
-    injection: isInjection(redacted),
-    ai: response,
-    status,
-  });
+  const injection = isInjection(redacted);
+  const route = decideLane({ keyword, extracted, injection, ai: response, status });
+  const notes = result.ok ? result.notes : [];
   return {
+    draftTemplate:
+      response && !injection && response.category === route.category
+        ? response.reply_template
+        : null,
     redacted,
     extracted,
     response,
     status,
     model: result.ok ? `${result.model} (${result.cache ? "cache" : "live"})` : "keyword fallback",
     route,
-    reason: result.ok ? route.reason : `${route.reason}. ${result.reason}`,
+    reason: result.ok ? [route.reason, ...notes].join(". ") : `${route.reason}. ${result.reason}`,
   };
 }
 async function appendEvent(
@@ -186,7 +189,12 @@ async function insertEnquiry(
   id?: string,
   offsetHours = 0,
 ): Promise<Enquiry> {
-  const draft = await makeDraft(db, analysis.route.category, analysis.extracted);
+  const draft = await makeDraft(
+    db,
+    analysis.route.category,
+    analysis.extracted,
+    analysis.draftTemplate,
+  );
   const { rows } = await db.query(
     `INSERT INTO enquiry(id,source,sender_name,contact,raw_text,redacted_text,received_at,category,confidence,extracted,lane,owner_team,gm_alert,ai_status,ai_reason,ai_model,ai_response,draft,draft_status,consent_at,idempotency_key)
     VALUES(COALESCE($1,'ENQ-'||nextval('enquiry_seq')),$2,$3,$4,$5,$6,now()+make_interval(hours=>$7),$8,$9,$10::jsonb,$11,$12,$13,$14,$15,$16,$17::jsonb,$18,'draft',now(),$19)
@@ -302,7 +310,7 @@ export async function rerunEnquiry(
   if (detail.enquiry.draft_status === "sent")
     throw new Error("This reply was already marked sent. Its sent record is preserved.");
   const a = await analyse(detail.enquiry.raw_text, detail.enquiry.sender_name ?? "");
-  const draft = await makeDraft(pool, a.route.category, a.extracted);
+  const draft = await makeDraft(pool, a.route.category, a.extracted, a.draftTemplate);
   await withTransaction(async (client) => {
     const result = await client.query(
       `UPDATE enquiry SET category=$2,confidence=$3,extracted=$4::jsonb,lane=$5,owner_team=$6,gm_alert=gm_alert OR $7,ai_status=$8,ai_reason=$9,ai_model=$10,ai_response=$11::jsonb,draft=$12,draft_status='draft',revision=revision+1 WHERE id=$1 AND revision=$13 AND draft_status IS DISTINCT FROM 'sent' RETURNING id`,
@@ -354,6 +362,7 @@ export async function seedEnquiries(client: ClientBase): Promise<void> {
       model,
       reason: `Demo fixture; ${route.reason}`,
       route,
+      draftTemplate: null,
     };
     await insertEnquiry(
       client,

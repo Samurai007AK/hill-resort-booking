@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { validateAiResponse, type AiResponse } from "@/domain/enquiry/pipeline";
+import { screenAiResponse, type AiResponse } from "@/domain/enquiry/pipeline";
 
 export const PROMPT_VERSION = "enquiry-v1";
 export const DEFAULT_MODEL = "free/qwen-3.8-max";
@@ -10,14 +10,15 @@ const OpenAiEnvelope = z.object({
 const OllamaEnvelope = z.object({ message: z.object({ content: z.string() }) });
 
 export type ProviderResult =
-  { ok: true; response: AiResponse; model: string } | { ok: false; reason: string };
+  | { ok: true; response: AiResponse; notes: string[]; model: string }
+  | { ok: false; reason: string };
 
 async function requestModel(
   redacted: string,
   model: string,
   kind: "primary" | "ollama",
   key: string,
-): Promise<AiResponse> {
+): Promise<{ response: AiResponse; notes: string[] }> {
   const response = await fetch(
     kind === "primary" ? "https://apinex.bond/v1/chat/completions" : "https://ollama.com/api/chat",
     {
@@ -36,15 +37,21 @@ async function requestModel(
       signal: AbortSignal.timeout(8000),
     },
   );
-  if (!response.ok) throw new Error("Provider unavailable");
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
   const envelope: unknown = await response.json();
   const content =
     kind === "primary"
       ? OpenAiEnvelope.parse(envelope).choices[0].message.content
       : OllamaEnvelope.parse(envelope).message.content;
-  const parsed = validateAiResponse(JSON.parse(content), redacted);
-  if (!parsed.success) throw new Error("Response failed validation");
-  return parsed.data;
+  let json: unknown;
+  try {
+    json = JSON.parse(content.replace(/^\s*```(?:json)?|```\s*$/g, ""));
+  } catch {
+    throw new Error("answer was not JSON");
+  }
+  const screened = screenAiResponse(json, redacted);
+  if (!screened.ok) throw new Error(screened.reason);
+  return { response: screened.response, notes: screened.notes };
 }
 
 export async function classifyWithProvider(redacted: string): Promise<ProviderResult> {
@@ -60,21 +67,21 @@ export async function classifyWithProvider(redacted: string): Promise<ProviderRe
   if (ollamaKey)
     for (const model of ["gpt-oss:120b", "beam", "gpt-oss:20b"])
       attempts.push({ kind: "ollama", model, key: ollamaKey });
+  const failures: string[] = [];
   for (const attempt of attempts) {
     try {
-      return {
-        ok: true,
-        response: await requestModel(redacted, attempt.model, attempt.kind, attempt.key),
-        model: attempt.model,
-      };
-    } catch {
-      /* The next provider is independent; never expose response bodies or credentials. */
+      const answer = await requestModel(redacted, attempt.model, attempt.kind, attempt.key);
+      return { ok: true, ...answer, model: attempt.model };
+    } catch (error) {
+      // Only our own short messages are kept: never response bodies or keys.
+      const timedOut = error instanceof Error && error.name === "TimeoutError";
+      failures.push(`${attempt.model}: ${timedOut ? "timed out" : (error as Error).message}`);
     }
   }
   return {
     ok: false,
     reason: attempts.length
-      ? "AI unavailable or response failed safety checks"
+      ? `AI unavailable (${failures.join("; ")})`
       : "AI unavailable: provider credentials are not configured",
   };
 }
