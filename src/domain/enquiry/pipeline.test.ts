@@ -241,3 +241,17 @@ describe("missing details route to the right team, not to Unsorted", () => {
     expect(route.reason).toMatch(/needs dates or guest count/i);
   });
 });
+
+test("'a child' supports one child, so the model's 1 is kept", () => {
+  const text = "Is a villa free 14-16 Nov for 2 adults and a child?";
+  const result = screenAiResponse(
+    {
+      category: "room",
+      confidence: 0.9,
+      extracted: { ...extractKeywords(text), adults: 2, children: 1, guests_total: 3 },
+      reply_template: "Thank you. {{DATES}}",
+    },
+    text,
+  );
+  expect(result.ok && result.response.extracted.children).toBe(1);
+});

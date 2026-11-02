@@ -41,7 +41,7 @@ npm run dev          # http://localhost:3000
 ```
 
 ```
-npm test                          # 210 tests on a real, throwaway Postgres
+npm test                          # 211 tests on a real, throwaway Postgres
 npm run eval                      # keyword baseline against 32 labelled enquiries
 npm run eval:live -- --offline    # rescore the recorded live-model run, no key needed
 ```

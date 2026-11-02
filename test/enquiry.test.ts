@@ -137,7 +137,9 @@ test("a provider outage falls back to keywords, stays unsorted and alerts the GM
   vi.stubEnv("APINEX_API_KEY", "test_provider_key");
   vi.stubEnv("OLLAMA_API_KEY", "");
   vi.stubGlobal("fetch", vi.fn(async () => new Response("busy", { status: 503 })));
-  const item = await ingestEnquiry({ ...input, idempotencyKey: randomUUID() });
+  // A message no earlier test cached, so the outage is really exercised.
+  const text = "Any family suite left for 3-5 Jan, two adults and two kids?";
+  const item = await ingestEnquiry({ ...input, text, idempotencyKey: randomUUID() });
   expect(item).toMatchObject({ ai_status: "fallback", lane: "unsorted", gm_alert: true });
   expect(item.ai_reason).toMatch(/HTTP 503/);
 });

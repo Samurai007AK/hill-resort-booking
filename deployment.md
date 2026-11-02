@@ -59,7 +59,7 @@ With no `DATABASE_URL` set, the app uses the local database above. With no AI ke
 npm test
 ```
 
-This runs all 210 Vitest tests. They start their own throwaway Postgres on port 54330, so the dev database is not touched and does not need to be running. If you set `DATABASE_URL` for tests, its database name must contain `test`, because the tests drop and recreate the schema. Tests never call an AI provider.
+This runs all 211 Vitest tests. They start their own throwaway Postgres on port 54330, so the dev database is not touched and does not need to be running. If you set `DATABASE_URL` for tests, its database name must contain `test`, because the tests drop and recreate the schema. Tests never call an AI provider.
 
 Other checks, as CI runs them:
 

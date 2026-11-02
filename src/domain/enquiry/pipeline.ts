@@ -264,7 +264,7 @@ function extractionProblems(
 ): { fields: ExtractedField[]; message: string }[] {
   const values = numericValues(text);
   const present = (v: number | null) =>
-    v === null || values.includes(v) || (v === 1 && /b(?:a|an|one)b/i.test(text));
+    v === null || values.includes(v) || (v === 1 && /\b(?:a|an|one)\b/i.test(text));
   const problems: { fields: ExtractedField[]; message: string }[] = [];
   for (const field of ["adults", "children", "budget_inr"] as const)
     if (!present(e[field])) problems.push({ fields: [field], message: "Invented number" });

@@ -25,7 +25,7 @@ Two promises carry the design. The site can never sell more rooms than the websi
 
 | Risk or requirement                         | Proof in the repo                                                                                                                                                    | Where to see it                                                |
 | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| "Pretty front end with nothing behind it"   | Full stack: Next.js, Postgres, 6 SQL migrations, 210 tests on a real database (`test/*.test.ts`)                                                                     | Every screen reads and writes the live database                |
+| "Pretty front end with nothing behind it"   | Full stack: Next.js, Postgres, 6 SQL migrations, 211 tests on a real database (`test/*.test.ts`)                                                                     | Every screen reads and writes the live database                |
 | "Everything built, nothing working"         | `test/guest.test.ts` books and pays a displayed stay end to end; the live app is deployed from this repo                                                             | Live app: home, room, details, TestPay, confirmation           |
 | "No sample data"                            | `src/server/seed.ts`, `test/seed.test.ts`; seed `0539367`; the three brief enquiries word for word in `eval/enquiries.json` (`e49ea2f`)                              | 180 nights of rates, 16 bookings, 32 enquiries                 |
 | "AI faked or not handling mistakes"         | Live run recorded in `eval/live-responses.json`, scored in `eval/RESULTS-live.md` (`6367fbf`, `9ca8345`); outage and malicious-draft tests in `test/enquiry.test.ts` | Inbox: Unsorted lane, GM alerts, "How the routing was decided" |
@@ -191,7 +191,7 @@ The brief asks for large photos, a quiet layout, a restrained palette, clear typ
 
 ## 10. Testing and CI
 
-210 tests in 18 files, all passing (`npx vitest --run`). Pure logic has table-driven unit tests. Database tests run against real Postgres, not mocks. Tests never call an AI provider; they use fakes or the recorded answers.
+211 tests in 18 files, all passing (`npx vitest --run`). Pure logic has table-driven unit tests. Database tests run against real Postgres, not mocks. Tests never call an AI provider; they use fakes or the recorded answers.
 
 What the key tests prove:
 
