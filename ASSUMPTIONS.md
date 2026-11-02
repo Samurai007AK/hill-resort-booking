@@ -34,6 +34,6 @@ The brief does not say these things, so they are decided here. Each one is numbe
 
 **A16. Display name.** Silver Oaks is a fictional demo name. Photos illustrate the stay and do not depict a verified property. Default system fonts avoid remote font downloads.
 
-
 **A17. Limited promos.** Promo usage is claimed atomically when payment confirms. If competing held bookings exhaust a promo before payment, the losing paid booking becomes refund due and releases its rooms. The demo does not silently charge a different total.
 
+**A18. Type.** Headings use one web face, Newsreader (light and regular, Latin only), which Next.js serves from the site itself; text is shown at once in a metric-matched serif fallback while it loads. Body text, forms and staff tables keep the system face. This replaces the font line in A16.

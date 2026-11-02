@@ -31,9 +31,8 @@ export default async function InboxPage({
   const detail = id.success ? await getEnquiry(id.data) : null;
   const selected = detail?.enquiry;
   return (
-    <div className="stack">
-      <div>
-        <span className="eyebrow">EVERY CONVERSATION, ACCOUNTED FOR</span>
+    <div className="screen">
+      <div className="screen-head">
         <h2>The enquiry inbox</h2>
         <p>
           Uncertain messages wait for a person. Complaints always alert the GM. Drafts never send
@@ -47,68 +46,73 @@ export default async function InboxPage({
             aria-current={lane === item.id ? "page" : undefined}
             href={`/staff/inbox?lane=${item.id}`}
           >
-            {item.label}{" "}
-            <span className="badge">
+            {item.label}
+            <span className="lane-count">
               {all.filter((enquiry) => enquiry.lane === item.id).length}
             </span>
           </Link>
         ))}
       </nav>
-      <div className="grid inbox-grid">
-        <section className="stack" aria-label={`${lane} enquiries`}>
+      <div className="inbox-grid">
+        <section aria-label={`${lane} enquiries`}>
           {enquiries.length ? (
-            enquiries.map((enquiry) => (
-              <Link
-                key={enquiry.id}
-                className="card stack"
-                href={`/staff/inbox?lane=${lane}&id=${enquiry.id}`}
-                aria-current={selected?.id === enquiry.id ? "true" : undefined}
-              >
-                <div className="actions">
-                  <strong>{enquiry.id}</strong>
-                  <span className="badge">{enquiry.source.replace("_", " ")}</span>
-                  {enquiry.gm_alert && <span className="badge alert">GM alert</span>}
-                </div>
-                <h3>{enquiry.sender_name ?? "Guest enquiry"}</h3>
-                <p>
-                  {enquiry.raw_text.length > 180
-                    ? `${enquiry.raw_text.slice(0, 180)}…`
-                    : enquiry.raw_text}
-                </p>
-                <Facts enquiry={enquiry} />
-                <small>
-                  {enquiry.category ?? "Needs review"} · {enquiry.owner_team ?? "Unassigned"} ·{" "}
-                  {enquiry.ai_model?.startsWith("demo fixture")
-                    ? `Demo fixture${enquiry.ai_status === "off" ? " · AI off" : enquiry.ai_status === "fallback" ? " · AI unavailable" : ""}`
-                    : enquiry.ai_status === "ok"
-                      ? "AI checked"
-                      : enquiry.ai_status === "off"
-                        ? "AI off"
-                        : "AI unavailable"}
-                </small>
-                {enquiry.ai_reason && <small>{enquiry.ai_reason}</small>}
-              </Link>
-            ))
+            <ul className="enquiry-list">
+              {enquiries.map((enquiry) => (
+                <li key={enquiry.id}>
+                  <Link
+                    href={`/staff/inbox?lane=${lane}&id=${enquiry.id}`}
+                    aria-current={selected?.id === enquiry.id ? "true" : undefined}
+                  >
+                    <span className="meta">
+                      <strong>{enquiry.id}</strong>
+                      <span className="chip">{enquiry.source.replace("_", " ")}</span>
+                      {enquiry.gm_alert && <span className="chip alert">GM alert</span>}
+                    </span>
+                    <h3>{enquiry.sender_name ?? "Guest enquiry"}</h3>
+                    <p>
+                      {enquiry.raw_text.length > 180
+                        ? `${enquiry.raw_text.slice(0, 180)}…`
+                        : enquiry.raw_text}
+                    </p>
+                    <Facts enquiry={enquiry} />
+                    <span className="meta">
+                      <span>{enquiry.category ?? "Needs review"}</span>
+                      <span>{enquiry.owner_team ?? "Unassigned"}</span>
+                      <span>
+                        {enquiry.ai_model?.startsWith("demo fixture")
+                          ? `Demo fixture${enquiry.ai_status === "off" ? ", AI off" : enquiry.ai_status === "fallback" ? ", AI unavailable" : ""}`
+                          : enquiry.ai_status === "ok"
+                            ? "AI checked"
+                            : enquiry.ai_status === "off"
+                              ? "AI off"
+                              : "AI unavailable"}
+                      </span>
+                    </span>
+                    {enquiry.ai_reason && <small className="muted">{enquiry.ai_reason}</small>}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <div className="card">
+            <div className="well stack">
               <h3>A clear lane.</h3>
               <p>No enquiries here. Try another lane or simulate a message below.</p>
             </div>
           )}
         </section>
-        <aside className="card stack" aria-label="Enquiry detail">
+        <aside className="card stack enquiry-detail" aria-label="Enquiry detail">
           {selected ? (
             <>
-              <div className="actions">
-                <span className="eyebrow">{selected.id}</span>
-                <span className="badge">
+              <h2>{selected.sender_name ?? "Guest enquiry"}</h2>
+              <p className="meta">
+                <span>{selected.id}</span>
+                <span className={selected.draft_status === "sent" ? "chip positive" : "chip"}>
                   {selected.draft_status === "sent" ? "Reply marked sent" : "Awaiting review"}
                 </span>
-              </div>
-              <h2>{selected.sender_name ?? "Guest enquiry"}</h2>
-              <p>{selected.contact}</p>
+                <span>{selected.contact}</span>
+              </p>
               <blockquote>{selected.raw_text}</blockquote>
-              <div className="notice stack">
+              <div className="well stack">
                 <strong>Extracted details</strong>
                 <Facts enquiry={selected} />
                 <small>
@@ -137,9 +141,9 @@ export default async function InboxPage({
                 <summary>How the routing was decided</summary>
                 <div className="stack">
                   <p>{selected.ai_reason}</p>
-                  <p>
-                    Model: {selected.ai_model ?? "Keyword fallback"} · confidence:{" "}
-                    {selected.confidence ?? "unavailable"}
+                  <p className="meta">
+                    <span>Model: {selected.ai_model ?? "Keyword fallback"}</span>
+                    <span>Confidence: {selected.confidence ?? "unavailable"}</span>
                   </p>
                   <h4>Redacted text used by the router</h4>
                   <pre>{selected.redacted_text}</pre>
@@ -159,9 +163,11 @@ export default async function InboxPage({
                   <ol className="timeline">
                     {detail.events.map((event, index) => (
                       <li key={index}>
-                        <strong>{event.kind}</strong> · {event.actor}
-                        <br />
-                        <small>
+                        <span className="meta">
+                          <strong>{event.kind}</strong>
+                          <span>{event.actor}</span>
+                        </span>
+                        <small className="muted">
                           {new Date(event.at).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}
                         </small>
                         <pre>{JSON.stringify(event.detail)}</pre>

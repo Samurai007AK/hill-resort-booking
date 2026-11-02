@@ -13,40 +13,47 @@ export default async function BookingsPage({
   const date = parsed.success ? parsed.data : undefined;
   const bookings = await listBookings(date);
   return (
-    <div className="stack">
-      <div>
-        <span className="eyebrow">RESERVATIONS</span>
+    <div className="screen">
+      <div className="screen-head">
         <h2>The next arrivals</h2>
-        <p>All statuses remain visible so late payments and refunds can be followed up.</p>
+        <p>
+          Reservations. All statuses remain visible so late payments and refunds can be followed up.
+        </p>
       </div>
-      <form className="actions">
+      <form className="filter-row">
         <label>
           Arrival date
           <input type="date" name="date" defaultValue={date ?? todayIST()} />
         </label>
-        <button className="button secondary">Filter arrivals</button>
+        <button className="button secondary" type="submit">
+          Filter arrivals
+        </button>
         <Link className="button secondary" href="/staff/bookings">
           All bookings
         </Link>
         <a className="button" href={`/staff/bookings/export?date=${date ?? todayIST()}`}>
-          Export {date ?? "today’s"} arrivals · CSV
+          Export {date ?? "today’s"} arrivals as CSV
         </a>
       </form>
       {bookings.length ? (
         <div className="table-scroll">
-          <table>
+          <table className="sticky-first">
             <caption>
-              {bookings.length} reservations · newest stays first within arrival date
+              {bookings.length} reservations, newest stays first within arrival date
             </caption>
             <thead>
               <tr>
-                <th>Reference</th>
-                <th>Guest</th>
-                <th>Room</th>
-                <th>Stay</th>
-                <th>Keys</th>
-                <th>Total</th>
-                <th>Status</th>
+                <th scope="col">Reference</th>
+                <th scope="col">Guest</th>
+                <th scope="col">Room</th>
+                <th scope="col">Stay</th>
+                <th scope="col" className="amount">
+                  Keys
+                </th>
+                <th scope="col" className="amount">
+                  Total
+                </th>
+                <th scope="col">Status</th>
               </tr>
             </thead>
             <tbody>
@@ -64,10 +71,20 @@ export default async function BookingsPage({
                     <br />
                     to {booking.check_out}
                   </td>
-                  <td>{booking.qty}</td>
-                  <td>₹{booking.quoted_total.toLocaleString("en-IN")}</td>
+                  <td className="amount">{booking.qty}</td>
+                  <td className="amount">₹{booking.quoted_total.toLocaleString("en-IN")}</td>
                   <td>
-                    <span className="badge">{booking.status.replaceAll("_", " ")}</span>
+                    <span
+                      className={
+                        booking.status === "confirmed"
+                          ? "chip positive"
+                          : booking.status === "refund_due"
+                            ? "chip alert"
+                            : "chip"
+                      }
+                    >
+                      {booking.status.replaceAll("_", " ")}
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -75,7 +92,7 @@ export default async function BookingsPage({
           </table>
         </div>
       ) : (
-        <section className="card">
+        <section className="well stack">
           <h3>No arrivals for this date.</h3>
           <p>Try another day or open all bookings.</p>
         </section>

@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Newsreader } from "next/font/google";
+import { GuestFooter } from "@/server/guest/ui";
 import "./globals.css";
+
+// Headings only; body text uses the system face (A18). Self-hosted by Next, shown with a fallback at once.
+const display = Newsreader({
+  subsets: ["latin"],
+  weight: ["300", "400"],
+  display: "swap",
+  variable: "--font-newsreader",
+});
 
 export const metadata: Metadata = {
   title: "Coffee Estate Resort, Chikkamagaluru",
@@ -9,15 +18,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col">
+    <html lang="en" className={display.variable}>
+      <body>
         {children}
-        <footer className="app-footer">
-          <Link href="/">Silver Oaks</Link>
-          <Link href="/enquire">Contact & events</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/login">Team sign in</Link>
-        </footer>
+        <GuestFooter />
       </body>
     </html>
   );

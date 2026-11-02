@@ -14,10 +14,10 @@ export function Facts({ enquiry }: { enquiry: Enquiry }) {
     details.guests_total !== null
       ? `${details.guests_total} guests`
       : details.adults !== null
-        ? `${details.adults} adults${details.children !== null ? ` · ${details.children} children` : ""}`
+        ? `${details.adults} adults${details.children !== null ? `, ${details.children} children` : ""}`
         : null;
   const stay = details.check_in
-    ? `${dateLabel(details.check_in)}${details.check_out ? ` – ${dateLabel(details.check_out)}` : ""}`
+    ? `${dateLabel(details.check_in)}${details.check_out ? ` to ${dateLabel(details.check_out)}` : ""}`
     : null;
   const facts = [
     stay,
@@ -27,14 +27,14 @@ export function Facts({ enquiry }: { enquiry: Enquiry }) {
   ];
   if (!facts.some(Boolean)) return <small>Dates, guests and budget still need confirmation.</small>;
   return (
-    <div className="actions" aria-label="Extracted enquiry details">
+    <span className="meta" aria-label="Extracted enquiry details">
       {facts
         .filter((fact) => fact)
         .map((fact) => (
-          <span className="badge" key={fact}>
+          <span className="chip" key={fact}>
             {fact}
           </span>
         ))}
-    </div>
+    </span>
   );
 }

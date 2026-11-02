@@ -14,12 +14,19 @@ export default async function GmPage() {
   ]);
   const alerts = enquiries.filter((enquiry) => enquiry.gm_alert);
   return (
-    <main className="page stack">
-      <header>
-        <div className="eyebrow">THE GENERAL MANAGER’S VIEW</div>
-        <h1>The estate, at a glance.</h1>
-        <p>Three goals: more direct stays, thoughtful replies, and no overbooked nights.</p>
-        <nav className="actions">
+    <main className="container app screen">
+      <header className="app-head">
+        <div className="stack">
+          <Link href="/" className="wordmark" aria-label="Silver Oaks, guest website">
+            Silver Oaks
+          </Link>
+          <h1>The estate, at a glance.</h1>
+          <p>
+            The general manager’s view. Three goals: more direct stays, thoughtful replies, and no
+            overbooked nights.
+          </p>
+        </div>
+        <nav className="actions" aria-label="GM tools">
           <Link className="button secondary" href="/staff">
             Open staff tools
           </Link>
@@ -27,15 +34,17 @@ export default async function GmPage() {
             Guest website
           </Link>
           <form action={logout}>
-            <button className="button secondary">Sign out</button>
+            <button className="button secondary" type="submit">
+              Sign out
+            </button>
           </form>
         </nav>
       </header>
-      <section className="grid three" aria-label="Success metrics">
-        <article className="card stack">
-          <div className="eyebrow">DIRECT SHARE · TARGET 12% → 20%</div>
-          <div className="metric">{metrics.directNights} nights</div>
-          <h3>Booked direct in this demo</h3>
+      <section className="stat-row" aria-label="Success metrics">
+        <article className="stat">
+          <h2>Direct share</h2>
+          <p className="metric">{metrics.directNights} nights</p>
+          <p className="stat-label">Booked direct in this demo. Target 12% to 20%.</p>
           <p>
             Illustrative agency commission avoided:{" "}
             <strong>₹{metrics.commissionAvoided.toLocaleString("en-IN")}</strong>, at the brief’s
@@ -47,14 +56,14 @@ export default async function GmPage() {
             measured annual direct share. Agency bookings are outside this system.
           </small>
         </article>
-        <article className="card stack">
-          <div className="eyebrow">FIRST REPLY · TARGET UNDER 30 MIN</div>
-          <div className="metric">
+        <article className="stat">
+          <h2>First reply</h2>
+          <p className="metric">
             {metrics.medianReplyMinutes === null
-              ? "—"
+              ? "None yet"
               : `${Math.round(metrics.medianReplyMinutes)} min`}
-          </div>
-          <h3>Median first reply</h3>
+          </p>
+          <p className="stat-label">Median first reply. Target under 30 min.</p>
           <p>
             {metrics.medianReplyMinutes === null
               ? "No replies have been marked sent yet."
@@ -65,37 +74,38 @@ export default async function GmPage() {
             configured.
           </small>
         </article>
-        <article className="card stack">
-          <div className="eyebrow">WEBSITE OVERBOOKINGS · TARGET ZERO</div>
-          <div className="metric">{metrics.overbookings}</div>
-          <h3>Nights over allotment</h3>
+        <article className="stat">
+          <h2>Website overbookings</h2>
+          <p className="metric">{metrics.overbookings}</p>
+          <p className="stat-label">Nights over allotment. Target zero.</p>
           <p>A live database audit checks sold keys plus active holds against website allotment.</p>
           <small>Confirmed stays and live holds share the same database capacity rule.</small>
         </article>
       </section>
-      <section className="card stack">
-        <div>
-          <div className="eyebrow">NEEDS YOUR ATTENTION</div>
+      <section className="stack">
+        <div className="screen-head">
           <h2>Complaint & fallback alerts</h2>
-          <p>Complaints and failed AI processing are surfaced for a person to review.</p>
+          <p>
+            Needs your attention. Complaints and failed AI processing are surfaced for a person to
+            review.
+          </p>
         </div>
         {alerts.length ? (
-          <ul className="stack">
+          <ul className="alert-list">
             {alerts.map((enquiry) => (
               <li key={enquiry.id}>
                 <Link href={`/staff/inbox?lane=${enquiry.lane}&id=${enquiry.id}`}>
                   <strong>
-                    {enquiry.id} · {enquiry.sender_name ?? "Guest"}
-                  </strong>{" "}
-                  — {enquiry.raw_text.slice(0, 150)}
+                    {enquiry.id}, {enquiry.sender_name ?? "Guest"}
+                  </strong>
                 </Link>
-                <br />
-                <small>{enquiry.ai_reason ?? "Review requested"}</small>
+                <span>{enquiry.raw_text.slice(0, 150)}</span>
+                <small className="muted">{enquiry.ai_reason ?? "Review requested"}</small>
               </li>
             ))}
           </ul>
         ) : (
-          <p>No alerts in the current inbox.</p>
+          <p className="well">No alerts in the current inbox.</p>
         )}
       </section>
       <Controls enabled={enabled} />

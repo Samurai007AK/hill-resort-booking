@@ -21,35 +21,46 @@ export default async function InventoryPage({
     ).values(),
   ];
   return (
-    <div className="stack">
-      <div>
-        <span className="eyebrow">INVENTORY</span>
+    <div className="screen">
+      <div className="screen-head">
         <h2>Rates & website allotment</h2>
         <p>The website sells only these keys. Held keys release automatically after ten minutes.</p>
       </div>
-      <form className="actions">
+      <form className="filter-row">
         <label>
           Calendar from
           <input type="date" name="from" defaultValue={from} required />
         </label>
-        <button className="button secondary">View thirty nights</button>
+        <button className="button secondary" type="submit">
+          View thirty nights
+        </button>
       </form>
       {nights.length ? (
         <>
           <InventoryEditor rooms={rooms} date={from} />
           <div className="table-scroll">
-            <table>
-              <caption>Thirty-night calendar · all rates before GST</caption>
+            <table className="sticky-first">
+              <caption>Thirty-night calendar, all rates before GST</caption>
               <thead>
                 <tr>
-                  <th>Room</th>
-                  <th>Night</th>
-                  <th>Tariff</th>
-                  <th>Allotment</th>
-                  <th>Sold</th>
-                  <th>Held</th>
-                  <th>Left</th>
-                  <th>State</th>
+                  <th scope="col">Room</th>
+                  <th scope="col">Night</th>
+                  <th scope="col" className="amount">
+                    Tariff
+                  </th>
+                  <th scope="col" className="amount">
+                    Allotment
+                  </th>
+                  <th scope="col" className="amount">
+                    Sold
+                  </th>
+                  <th scope="col" className="amount">
+                    Held
+                  </th>
+                  <th scope="col" className="amount">
+                    Left
+                  </th>
+                  <th scope="col">State</th>
                 </tr>
               </thead>
               <tbody>
@@ -57,15 +68,19 @@ export default async function InventoryPage({
                   <tr key={`${night.room_type_id}-${night.night}`}>
                     <th scope="row">{night.room_name}</th>
                     <td>{night.night}</td>
-                    <td>₹{night.rate_inr.toLocaleString("en-IN")}</td>
-                    <td>
+                    <td className="amount">₹{night.rate_inr.toLocaleString("en-IN")}</td>
+                    <td className="amount">
                       {night.allotment} / {night.keys_total}
                     </td>
-                    <td>{night.sold}</td>
-                    <td>{night.held}</td>
-                    <td>{night.remaining}</td>
+                    <td className="amount">{night.sold}</td>
+                    <td className="amount">{night.held}</td>
+                    <td className="amount">{night.remaining}</td>
                     <td>
-                      <span className="badge">
+                      <span
+                        className={
+                          night.closed ? "chip alert" : night.remaining ? "chip positive" : "chip"
+                        }
+                      >
                         {night.closed ? "Off sale" : night.remaining ? "Open" : "Full"}
                       </span>
                     </td>
@@ -76,7 +91,7 @@ export default async function InventoryPage({
           </div>
         </>
       ) : (
-        <div className="card">
+        <div className="well stack">
           <h3>No published nights here.</h3>
           <p>Choose a date in the current demo calendar, or ask the GM to reset the demo.</p>
         </div>

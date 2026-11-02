@@ -49,7 +49,7 @@ export function BookingForm(props: Props) {
           maxLength={30}
           required
         />
-        <small>International guests: include your + country code.</small>
+        <small className="hint">International guests: include your + country code.</small>
       </label>
       <label>
         Promo code <span className="muted">(optional)</span>
@@ -82,7 +82,7 @@ export function BookingForm(props: Props) {
         </p>
       )}
       <button type="submit" className="button" disabled={pending}>
-        {pending ? "Holding your room…" : "Hold room & continue to TestPay ↗"}
+        {pending ? "Holding your room…" : "Hold room & continue to TestPay"}
       </button>
       <p className="muted small">
         Nothing is charged. This is a demonstration booking with simulated payment.

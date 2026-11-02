@@ -57,8 +57,8 @@ export default function EnquiryForm({ today }: { today: string }) {
   if (success)
     return (
       <div className="card stack" role="status">
-        <p className="eyebrow">Enquiry received</p>
-        <h2>Thank you. We’ll take it from here.</h2>
+        <h2>Enquiry received</h2>
+        <p className="lead">Thank you. We’ll take it from here.</p>
         <p>
           Your reference is <strong>{success}</strong>. Our team will review your enquiry and reply
           using the contact details you shared.
@@ -78,7 +78,7 @@ export default function EnquiryForm({ today }: { today: string }) {
           <option value="offsite">An offsite or team gathering</option>
         </select>
       </label>
-      <div className="grid">
+      <div className="form-grid">
         <label>
           Your name
           <input name="senderName" autoComplete="name" required minLength={2} maxLength={100} />
@@ -89,7 +89,7 @@ export default function EnquiryForm({ today }: { today: string }) {
         </label>
       </div>
       {kind !== "contact" && (
-        <div className="grid">
+        <div className="form-grid three">
           <label>
             Preferred event date
             <input name="eventDate" type="date" min={today} />
@@ -120,8 +120,11 @@ export default function EnquiryForm({ today }: { today: string }) {
         />
       </label>
       <label className="consent">
-        <input name="consent" type="checkbox" required />I consent to the resort using these details
-        to respond to my enquiry. <Link href="/privacy">Privacy notice</Link>
+        <input name="consent" type="checkbox" required />
+        <span>
+          I consent to the resort using these details to respond to my enquiry.{" "}
+          <Link href="/privacy">Privacy notice</Link>
+        </span>
       </label>
       <p className="muted">
         Please leave passport and government ID details out of this form. Replies are reviewed by

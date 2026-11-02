@@ -6,11 +6,11 @@ import { availability, quoteStay } from "@/server/booking";
 import { getRoom, plansFor, stayInput } from "@/server/guest/catalog";
 import { parseSearch, fits } from "@/server/guest/rules";
 import {
-  displayDate,
-  GuestFooter,
   GuestHeader,
+  party,
   PriceBreakdown,
   searchQuery,
+  stayDates,
   Stepper,
 } from "@/server/guest/ui";
 import { BookingForm } from "./booking-form";
@@ -40,10 +40,19 @@ export default async function BookPage({
   return (
     <>
       <GuestHeader />
-      <main className="page stack">
-        <Stepper step={2} />
+      <main className="container page">
+        <div className="flow-bar">
+          {valid && result?.kind === "quote" ? (
+            <Link href={`/rooms/${room.id}?${searchQuery(search)}`} className="text-link">
+              Change stay
+            </Link>
+          ) : (
+            <span />
+          )}
+          <Stepper step={2} />
+        </div>
         {!valid || result?.kind !== "quote" ? (
-          <section className="card stack">
+          <section className="quiet-page" role="status">
             <h1>Let’s choose your stay again.</h1>
             <p>
               {error ??
@@ -57,15 +66,9 @@ export default async function BookPage({
           </section>
         ) : (
           <>
-            <div className="section-heading">
-              <div>
-                <p className="eyebrow">YOUR HILLSIDE ESCAPE</p>
-                <h1>Make it yours.</h1>
-              </div>
-              <Link href={`/rooms/${room.id}?${searchQuery(search)}`} className="text-link">
-                ← Change stay
-              </Link>
-            </div>
+            <header className="page-head">
+              <h1>Make it yours.</h1>
+            </header>
             <div className="checkout-grid">
               <BookingForm
                 roomTypeId={room.id}
@@ -78,19 +81,21 @@ export default async function BookPage({
                 promoCode={search.promo}
                 idempotencyKey={randomUUID()}
               />
-              <aside className="card stack">
+              <aside className="card stack" aria-label="Your stay">
                 <EstatePhoto
                   className="summary-photo"
                   src={room.photos[0]?.replace("w=1600", "w=700")}
                   alt={room.name}
+                  sizes="(max-width: 960px) 100vw, 40vw"
                 />
-                <div>
+                <div className="stack">
                   <h2>{room.name}</h2>
-                  <p>{plan.name}</p>
                   <p>
-                    {displayDate(search.checkIn)} – {displayDate(search.checkOut)}
+                    {plan.name}
                     <br />
-                    {search.adults} adults, {search.children} children · {search.qty} rooms
+                    {stayDates(search.checkIn, search.checkOut)}
+                    <br />
+                    {party(search)}
                   </p>
                 </div>
                 <PriceBreakdown quote={result.quote} qty={search.qty} />
@@ -103,7 +108,6 @@ export default async function BookPage({
           </>
         )}
       </main>
-      <GuestFooter />
     </>
   );
 }

@@ -30,7 +30,7 @@ export function RoutingTools({
     <form action={action} className="stack">
       <input name="id" type="hidden" value={id} />
       <input name="revision" type="hidden" value={revision} />
-      <div className="actions">
+      <div className="filter-row">
         <label>
           Move to
           <select name="lane" defaultValue={lane}>
