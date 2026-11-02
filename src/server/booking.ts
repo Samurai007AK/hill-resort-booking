@@ -2,7 +2,13 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { pool } from "@/db/pool";
 import { todayIST } from "@/domain/dates";
-import { nightsBetween, priceStay, type Discount, type PriceLine, type Quote } from "@/domain/pricing";
+import {
+  nightsBetween,
+  priceStay,
+  type Discount,
+  type PriceLine,
+  type Quote,
+} from "@/domain/pricing";
 import { checkPromo, type PromoRefusal } from "@/domain/promo";
 import { secret } from "./secrets";
 
@@ -45,7 +51,10 @@ export const HoldInput = z
     children: z.coerce.number().int().min(0).max(12),
     guestName: z.string().trim().min(2).max(100),
     guestEmail: z.email().max(200),
-    guestPhone: z.string().trim().regex(/^\+?[\d\s-]{8,18}$/, "Enter a phone number"),
+    guestPhone: z
+      .string()
+      .trim()
+      .regex(/^\+?[\d\s-]{8,18}$/, "Enter a phone number"),
     consent: z.literal(true, "Consent is needed to book"),
     idempotencyKey: z.string().min(8).max(100),
   })
@@ -78,19 +87,20 @@ export type QuoteResult =
   | { kind: "quote"; quote: Quote }
   | { kind: "sold_out"; night: string }
   | { kind: "promo_invalid"; reason: PromoRefusal | "unknown" }
-  | { kind: "invalid"; reason: "past_dates" | "unknown_rate_plan" };
+  | { kind: "invalid"; reason: "past_dates" | "unknown_rate_plan" | "party_too_large" };
 
-export type HoldResult = { kind: "held"; reservation: Reservation } | Exclude<QuoteResult, { kind: "quote" }>;
+export type HoldResult =
+  { kind: "held"; reservation: Reservation } | Exclude<QuoteResult, { kind: "quote" }>;
 
 /** Prices a stay from the rate table, never from anywhere else. Read-only, no locks. */
 export async function quoteStay(input: StayInput): Promise<QuoteResult> {
   if (input.checkIn < todayIST()) return { kind: "invalid", reason: "past_dates" };
   const nights = nightsBetween(input.checkIn, input.checkOut);
 
-  const plan = await pool.query<{ factor: number }>("SELECT factor FROM rate_plans WHERE id = $1 AND room_type_id = $2", [
-    input.ratePlanId,
-    input.roomTypeId,
-  ]);
+  const plan = await pool.query<{ factor: number }>(
+    "SELECT factor FROM rate_plans WHERE id = $1 AND room_type_id = $2",
+    [input.ratePlanId, input.roomTypeId],
+  );
   if (!plan.rows[0]) return { kind: "invalid", reason: "unknown_rate_plan" };
 
   const { rows: rates } = await pool.query<{ night: string; rate_inr: number; closed: boolean }>(
@@ -140,6 +150,18 @@ export async function createHold(input: HoldInput): Promise<HoldResult> {
   const existing = await findByIdempotencyKey(input.idempotencyKey);
   if (existing) return { kind: "held", reservation: existing };
 
+  const { rows: rooms } = await pool.query<{ max_adults: number; max_children: number }>(
+    "SELECT max_adults, max_children FROM room_types WHERE id = $1",
+    [input.roomTypeId],
+  );
+  const room = rooms[0];
+  if (
+    room &&
+    (input.adults > room.max_adults * input.qty || input.children > room.max_children * input.qty)
+  ) {
+    return { kind: "invalid", reason: "party_too_large" };
+  }
+
   const q = await quoteStay(input);
   if (q.kind !== "quote") return q;
 
@@ -169,12 +191,17 @@ export async function createHold(input: HoldInput): Promise<HoldResult> {
       ],
     );
     // No row only when a concurrent request with the same key inserted first.
-    const reservation = rows[0] ? toReservation(rows[0]) : await findByIdempotencyKey(input.idempotencyKey);
+    const reservation = rows[0]
+      ? toReservation(rows[0])
+      : await findByIdempotencyKey(input.idempotencyKey);
     return { kind: "held", reservation: reservation! };
   } catch (e) {
     const err = e as { code?: string; detail?: string };
     if (err.code !== "23514") throw e;
-    return { kind: "sold_out", night: err.detail?.match(/Night (\d{4}-\d{2}-\d{2})/)?.[1] ?? input.checkIn };
+    return {
+      kind: "sold_out",
+      night: err.detail?.match(/Night (\d{4}-\d{2}-\d{2})/)?.[1] ?? input.checkIn,
+    };
   }
 }
 
@@ -223,7 +250,8 @@ export function signPayment(p: Omit<PaymentCallback, "signature">): string {
 export async function applyPayment(p: PaymentCallback): Promise<PaymentResult> {
   const expected = Buffer.from(signPayment(p), "hex");
   const given = Buffer.from(p.signature, "hex");
-  if (given.length !== expected.length || !timingSafeEqual(given, expected)) return { kind: "bad_signature" };
+  if (given.length !== expected.length || !timingSafeEqual(given, expected))
+    return { kind: "bad_signature" };
   try {
     const { rows } = await pool.query("SELECT * FROM apply_payment($1, $2, $3, $4)", [
       p.paymentId,
@@ -232,7 +260,13 @@ export async function applyPayment(p: PaymentCallback): Promise<PaymentResult> {
       p.status === "success",
     ]);
     const r = rows[0];
-    return { kind: "applied", outcome: r.outcome, reservationStatus: r.reservation_status, late: r.late, replay: r.replay };
+    return {
+      kind: "applied",
+      outcome: r.outcome,
+      reservationStatus: r.reservation_status,
+      late: r.late,
+      replay: r.replay,
+    };
   } catch (e) {
     if ((e as { code?: string }).code === "P0002") return { kind: "unknown_reservation" };
     throw e;
@@ -247,14 +281,28 @@ export type Availability = {
   available: number;
 };
 
-export async function availability(roomTypeId: string, checkIn: string, checkOut: string): Promise<Availability> {
+export async function availability(
+  roomTypeId: string,
+  checkIn: string,
+  checkOut: string,
+): Promise<Availability> {
   const want = nightsBetween(checkIn, checkOut).length;
-  const { rows } = await pool.query<{ night: string; rate_inr: number; closed: boolean; remaining: number }>(
+  const { rows } = await pool.query<{
+    night: string;
+    rate_inr: number;
+    closed: boolean;
+    remaining: number;
+  }>(
     `SELECT night, rate_inr, closed, remaining FROM night_usage
      WHERE room_type_id = $1 AND night >= $2 AND night < $3 ORDER BY night`,
     [roomTypeId, checkIn, checkOut],
   );
-  const nights = rows.map((r) => ({ night: r.night, rate: r.rate_inr, closed: r.closed, remaining: r.remaining }));
+  const nights = rows.map((r) => ({
+    night: r.night,
+    rate: r.rate_inr,
+    closed: r.closed,
+    remaining: r.remaining,
+  }));
   const available = nights.length === want ? Math.min(...nights.map((n) => n.remaining)) : 0;
   return { nights, available };
 }
