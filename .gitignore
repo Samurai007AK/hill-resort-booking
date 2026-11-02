@@ -18,7 +18,6 @@ next-env.d.ts
 *.pem
 AGENTS.md
 
-.claude/
 .unlazy/
 
 /output/

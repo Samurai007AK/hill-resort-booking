@@ -1,5 +1,4 @@
 .pgdata
-.claude
 .env*
 !.env.example
 output
