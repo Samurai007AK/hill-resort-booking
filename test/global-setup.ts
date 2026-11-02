@@ -1,3 +1,4 @@
+import { rmSync } from "node:fs";
 import EmbeddedPostgres from "embedded-postgres";
 import pg from "pg";
 import { dropAll, migrate } from "../src/db/migrate";
@@ -11,6 +12,7 @@ export default async function setup() {
     // The schema gets dropped, so refuse anything that is not clearly a test database.
     if (!/test/i.test(new URL(url).pathname)) throw new Error("DATABASE_URL for tests must name a *test* database");
   } else {
+    rmSync(".pgdata-test", { recursive: true, force: true }); // left behind if a run was killed
     embedded = new EmbeddedPostgres({
       databaseDir: ".pgdata-test",
       port: 54330,
