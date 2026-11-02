@@ -29,3 +29,11 @@ The brief does not say these things, so they are decided here. Each one is numbe
 **A13. Payments.** Payments are mocked by an in-app gateway, TestPay, which sends a callback signed with HMAC-SHA256. A repeated callback (same payment id) returns the stored answer. A second, different successful payment for a booking that is already paid is marked refund due. A failed payment leaves the hold as it was so the guest can retry.
 
 **A14. Weekend.** Friday and Saturday nights are weekend nights.
+
+**A15. Rate bounds.** Admin-set nightly rates must stay between INR 1,000 and INR 500,000. Allotment cannot exceed the physical keys of its room type; occupied nights cannot be deleted.
+
+**A16. Display name.** Silver Oaks is a fictional demo name. Photos illustrate the stay and do not depict a verified property. Default system fonts avoid remote font downloads.
+
+
+**A17. Limited promos.** Promo usage is claimed atomically when payment confirms. If competing held bookings exhaust a promo before payment, the losing paid booking becomes refund due and releases its rooms. The demo does not silently charge a different total.
+
