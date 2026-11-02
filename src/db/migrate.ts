@@ -6,8 +6,14 @@ const DIR = path.join(process.cwd(), "db", "migrations");
 
 /** Applies db/migrations/NNNN_*.sql in name order, each once, each in its own transaction. */
 export async function migrate(client: ClientBase): Promise<string[]> {
-  await client.query("CREATE TABLE IF NOT EXISTS schema_migrations (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())");
-  const done = new Set((await client.query<{ name: string }>("SELECT name FROM schema_migrations")).rows.map((r) => r.name));
+  await client.query(
+    "CREATE TABLE IF NOT EXISTS schema_migrations (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())",
+  );
+  const done = new Set(
+    (await client.query<{ name: string }>("SELECT name FROM schema_migrations")).rows.map(
+      (r) => r.name,
+    ),
+  );
   const files = (await readdir(DIR)).filter((f) => f.endsWith(".sql")).sort();
   const applied: string[] = [];
   for (const file of files.filter((f) => !done.has(f))) {
