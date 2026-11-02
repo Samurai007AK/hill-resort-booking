@@ -3,7 +3,17 @@ node_modules/
 .env.*
 !.env.example
 .next/
+out/
+build/
 dist/
 coverage/
+.metrics/
+.pgdata/
+.pgdata-test/
 *.log
+*.tsbuildinfo
+next-env.d.ts
+.vercel
 .DS_Store
+*.pem
+AGENTS.md
