@@ -4,7 +4,8 @@ import { dropAll, migrate } from "@/db/migrate";
 import { seedDemo } from "@/server/seed";
 
 async function main() {
-  if (process.env.NODE_ENV === "production") throw new Error("db:reset refuses to run in production");
+  if (process.env.NODE_ENV === "production")
+    throw new Error("db:reset refuses to run in production");
   const client = await pool.connect();
   try {
     await dropAll(client);

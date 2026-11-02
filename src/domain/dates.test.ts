@@ -1,5 +1,12 @@
 import { expect, test } from "vitest";
-import { addDays, isWeekendNight, todayIST } from "./dates";
+import { addDays, isIsoDate, isWeekendNight, todayIST } from "./dates";
+
+test.each(["2026-99-99", "2026-00-01", "2026-02-30", "not-a-date"])(
+  "invalid date %s returns false without throwing",
+  (date) => {
+    expect(isIsoDate(date)).toBe(false);
+  },
+);
 
 test("today is the date in India, not UTC", () => {
   expect(todayIST(new Date("2026-11-01T18:29:00Z"))).toBe("2026-11-01");

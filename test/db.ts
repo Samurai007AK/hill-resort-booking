@@ -57,7 +57,15 @@ export async function insertReservation(db: ClientBase | Pool, s: Stay): Promise
                               quoted_total, price_lines, guest_name, guest_email, guest_phone, consent_at)
      VALUES ($1, $2, $3, $4, $5, $6, now() + make_interval(secs => $7), 1000, '[]', 'Test Guest', 'guest@example.com', '+91 90000 00000', now())
      RETURNING id`,
-    [s.roomTypeId, s.ratePlanId, s.checkIn, s.checkOut, s.qty ?? 1, s.status ?? "held", s.holdSeconds ?? 600],
+    [
+      s.roomTypeId,
+      s.ratePlanId,
+      s.checkIn,
+      s.checkOut,
+      s.qty ?? 1,
+      s.status ?? "held",
+      s.holdSeconds ?? 600,
+    ],
   );
   return rows[0].id;
 }

@@ -8,6 +8,7 @@ const pg = new EmbeddedPostgres({
   user: "postgres",
   password: "postgres",
   persistent: true,
+  initdbFlags: ["--encoding=UTF8", "--locale=C"],
   onLog: () => {},
 });
 
@@ -15,7 +16,9 @@ async function main() {
   if (!existsSync(".pgdata")) await pg.initialise();
   await pg.start();
   await pg.createDatabase("resort").catch(() => {}); // already exists after the first run
-  console.log("Postgres ready: postgres://postgres:postgres@localhost:54329/resort (Ctrl+C to stop)");
+  console.log(
+    "Postgres ready: postgres://postgres:postgres@localhost:54329/resort (Ctrl+C to stop)",
+  );
   const stop = async () => {
     await pg.stop();
     process.exit(0);

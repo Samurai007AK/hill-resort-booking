@@ -35,8 +35,15 @@ describe("priceStay: GST slab per night", () => {
     [7501, 18, 1350, 8851], // 1350.18 rounds down
   ])("₹%i a night", (tariff, gstRate, gst, total) => {
     const q = priceStay({ nights: one(tariff), planFactor: 1, qty: 1 });
-    expect(q.lines).toEqual([{ date: "2026-11-05", tariff, discount: 0, taxable: tariff, gstRate, gst, total }]);
-    expect(q).toMatchObject({ subtotal: tariff, discountTotal: 0, gstTotal: gst, grandTotal: total });
+    expect(q.lines).toEqual([
+      { date: "2026-11-05", tariff, discount: 0, taxable: tariff, gstRate, gst, total },
+    ]);
+    expect(q).toMatchObject({
+      subtotal: tariff,
+      discountTotal: 0,
+      gstTotal: gst,
+      grandTotal: total,
+    });
   });
 
   test("weekday + weekend Estate stay crosses the slab line night by night", () => {
@@ -54,13 +61,30 @@ describe("priceStay: GST slab per night", () => {
       [18, 1476, 9676],
       [18, 1476, 9676],
     ]);
-    expect(q).toMatchObject({ subtotal: 23600, discountTotal: 0, gstTotal: 3312, grandTotal: 26912 });
+    expect(q).toMatchObject({
+      subtotal: 23600,
+      discountTotal: 0,
+      gstTotal: 3312,
+      grandTotal: 26912,
+    });
   });
 
   test("a 15% promo pushes ₹8,200 under the line, so the night is taxed at 5%", () => {
-    const q = priceStay({ nights: one(8200), planFactor: 1, qty: 1, promo: { kind: "percent", value: 15 } });
+    const q = priceStay({
+      nights: one(8200),
+      planFactor: 1,
+      qty: 1,
+      promo: { kind: "percent", value: 15 },
+    });
     // 8200 - 1230 = 6970; 5% = 348.5 -> 349
-    expect(q.lines[0]).toMatchObject({ tariff: 8200, discount: 1230, taxable: 6970, gstRate: 5, gst: 349, total: 7319 });
+    expect(q.lines[0]).toMatchObject({
+      tariff: 8200,
+      discount: 1230,
+      taxable: 6970,
+      gstRate: 5,
+      gst: 349,
+      total: 7319,
+    });
     expect(q.grandTotal).toBe(7319);
   });
 
@@ -71,14 +95,24 @@ describe("priceStay: GST slab per night", () => {
 
   test("qty 2: amounts double, the slab is still chosen on one key's price", () => {
     const q = priceStay({ nights: one(8200), planFactor: 1, qty: 2 });
-    expect(q.lines[0]).toMatchObject({ tariff: 8200, discount: 0, taxable: 16400, gstRate: 18, gst: 2952, total: 19352 });
+    expect(q.lines[0]).toMatchObject({
+      tariff: 8200,
+      discount: 0,
+      taxable: 16400,
+      gstRate: 18,
+      gst: 2952,
+      total: 19352,
+    });
     expect(q).toMatchObject({ subtotal: 16400, gstTotal: 2952, grandTotal: 19352 });
   });
 });
 
 describe("priceStay: flat promo per stay", () => {
   test("spread in proportion to each night, remainder on the last night, total exact", () => {
-    const nights = ["2026-11-10", "2026-11-11", "2026-11-12"].map((date) => ({ date, tariff: 9500 }));
+    const nights = ["2026-11-10", "2026-11-11", "2026-11-12"].map((date) => ({
+      date,
+      tariff: 9500,
+    }));
     const q = priceStay({ nights, planFactor: 1, qty: 1, promo: { kind: "flat", value: 1000 } });
     expect(q.lines.map((l) => l.discount)).toEqual([333, 333, 334]);
     expect(q.discountTotal).toBe(1000);
@@ -102,17 +136,32 @@ describe("priceStay: flat promo per stay", () => {
       [695, 7505, 18, 1351],
       [695, 7505, 18, 1351],
     ]);
-    expect(q).toMatchObject({ subtotal: 23600, discountTotal: 2000, gstTotal: 3032, grandTotal: 24632 });
+    expect(q).toMatchObject({
+      subtotal: 23600,
+      discountTotal: 2000,
+      gstTotal: 3032,
+      grandTotal: 24632,
+    });
   });
 
   test("covers all keys once, not per key", () => {
-    const q = priceStay({ nights: one(9500), planFactor: 1, qty: 2, promo: { kind: "flat", value: 2000 } });
+    const q = priceStay({
+      nights: one(9500),
+      planFactor: 1,
+      qty: 2,
+      promo: { kind: "flat", value: 2000 },
+    });
     expect(q.discountTotal).toBe(2000);
     expect(q.lines[0].taxable).toBe(17000);
   });
 
   test("never discounts below zero", () => {
-    const q = priceStay({ nights: one(7200), planFactor: 1, qty: 1, promo: { kind: "flat", value: 99999 } });
+    const q = priceStay({
+      nights: one(7200),
+      planFactor: 1,
+      qty: 1,
+      promo: { kind: "flat", value: 99999 },
+    });
     expect(q).toMatchObject({ discountTotal: 7200, gstTotal: 0, grandTotal: 0 });
   });
 });

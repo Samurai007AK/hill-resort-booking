@@ -14,7 +14,10 @@ export type Promo = Discount & {
 export type PromoRefusal = "inactive" | "not_yet_valid" | "expired" | "min_nights" | "used_up";
 export type PromoCheck = { ok: true } | { ok: false; reason: PromoRefusal };
 
-export function checkPromo(promo: Promo, ctx: { stayNights: number; today: string; usesSoFar: number }): PromoCheck {
+export function checkPromo(
+  promo: Promo,
+  ctx: { stayNights: number; today: string; usesSoFar: number },
+): PromoCheck {
   const no = (reason: PromoRefusal): PromoCheck => ({ ok: false, reason });
   if (!promo.active) return no("inactive");
   if (ctx.today < promo.validFrom) return no("not_yet_valid");

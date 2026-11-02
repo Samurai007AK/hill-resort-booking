@@ -18,7 +18,12 @@ test.each([
   ["first day of window", promo, { ...ok, today: "2026-11-01" }, { ok: true }],
   ["last day of window", promo, { ...ok, today: "2026-12-31" }, { ok: true }],
   ["switched off", { ...promo, active: false }, ok, { ok: false, reason: "inactive" }],
-  ["before the window", promo, { ...ok, today: "2026-10-31" }, { ok: false, reason: "not_yet_valid" }],
+  [
+    "before the window",
+    promo,
+    { ...ok, today: "2026-10-31" },
+    { ok: false, reason: "not_yet_valid" },
+  ],
   ["after the window", promo, { ...ok, today: "2027-01-01" }, { ok: false, reason: "expired" }],
   ["stay too short", promo, { ...ok, stayNights: 1 }, { ok: false, reason: "min_nights" }],
   ["used up", promo, { ...ok, usesSoFar: 10 }, { ok: false, reason: "used_up" }],

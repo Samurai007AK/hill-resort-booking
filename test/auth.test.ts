@@ -29,7 +29,13 @@ test("a wrong password or an unknown email gets nothing", async () => {
 });
 
 test("a session survives the cookie round trip; a forged one does not", async () => {
-  const s = { userId: "u1", email: EMAIL, name: "Riya", role: "staff" as const, team: "sales" as const };
+  const s = {
+    userId: "u1",
+    email: EMAIL,
+    name: "Riya",
+    role: "staff" as const,
+    team: "sales" as const,
+  };
   expect(await verifySession(await signSession(s))).toEqual(s);
 
   const forged = await new SignJWT({ ...s, role: "gm" })
@@ -38,4 +44,17 @@ test("a session survives the cookie round trip; a forged one does not", async ()
   expect(await verifySession(forged)).toBeNull();
   expect(await verifySession(undefined)).toBeNull();
   expect(await verifySession("not-a-token")).toBeNull();
+});
+
+test("a correctly signed token still needs a valid role and team payload", async () => {
+  for (const payload of [
+    { role: "gm" },
+    { userId: "u1", email: EMAIL, name: "Riya", role: "staff", team: null },
+  ]) {
+    const malformed = await new SignJWT(payload)
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("1h")
+      .sign(new TextEncoder().encode(process.env.SESSION_SECRET));
+    expect(await verifySession(malformed)).toBeNull();
+  }
 });

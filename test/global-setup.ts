@@ -10,7 +10,8 @@ export default async function setup() {
   let url = process.env.DATABASE_URL;
   if (url) {
     // The schema gets dropped, so refuse anything that is not clearly a test database.
-    if (!/test/i.test(new URL(url).pathname)) throw new Error("DATABASE_URL for tests must name a *test* database");
+    if (!/test/i.test(new URL(url).pathname))
+      throw new Error("DATABASE_URL for tests must name a *test* database");
   } else {
     rmSync(".pgdata-test", { recursive: true, force: true }); // left behind if a run was killed
     embedded = new EmbeddedPostgres({
@@ -19,6 +20,7 @@ export default async function setup() {
       user: "postgres",
       password: "postgres",
       persistent: false,
+      initdbFlags: ["--encoding=UTF8", "--locale=C"],
       onLog: () => {},
     });
     await embedded.initialise();

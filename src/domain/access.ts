@@ -15,6 +15,7 @@ export function homeFor(role: Role): string {
 
 /** A post-login redirect target: a same-site path the role may open, else the role's home. */
 export function safeNext(role: Role, next: string | null | undefined): string {
-  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\")) return homeFor(role);
+  if (!next || !next.startsWith("/") || next.startsWith("//") || next.startsWith("/\\"))
+    return homeFor(role);
   return canAccess(role, next) ? next : homeFor(role);
 }

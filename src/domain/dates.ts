@@ -4,7 +4,8 @@ const ISO = /^\d{4}-\d{2}-\d{2}$/;
 
 /** True for a real calendar date in YYYY-MM-DD form. */
 export function isIsoDate(s: string): boolean {
-  return ISO.test(s) && new Date(`${s}T00:00:00Z`).toISOString().slice(0, 10) === s;
+  const date = new Date(`${s}T00:00:00Z`);
+  return ISO.test(s) && Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === s;
 }
 
 export function addDays(iso: string, n: number): string {

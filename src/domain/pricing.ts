@@ -52,7 +52,10 @@ export function priceStay(input: {
   promo?: Discount;
 }): Quote {
   const { qty, promo } = input;
-  const base = input.nights.map((n) => ({ date: n.date, tariff: roundHalfUp(n.tariff * input.planFactor) }));
+  const base = input.nights.map((n) => ({
+    date: n.date,
+    tariff: roundHalfUp(n.tariff * input.planFactor),
+  }));
   const amounts = base.map((n) => n.tariff * qty);
   const subtotal = amounts.reduce((s, a) => s + a, 0);
   const discounts = discountPerNight(amounts, subtotal, promo);
@@ -61,10 +64,24 @@ export function priceStay(input: {
     const taxable = amounts[i] - discounts[i];
     const gstRate = taxable <= GST_SLAB_LIMIT * qty ? 5 : 18;
     const gst = roundHalfUp((taxable * gstRate) / 100);
-    return { date: n.date, tariff: n.tariff, discount: discounts[i], taxable, gstRate, gst, total: taxable + gst };
+    return {
+      date: n.date,
+      tariff: n.tariff,
+      discount: discounts[i],
+      taxable,
+      gstRate,
+      gst,
+      total: taxable + gst,
+    };
   });
   const sum = (k: "discount" | "gst" | "total") => lines.reduce((s, l) => s + l[k], 0);
-  return { lines, subtotal, discountTotal: sum("discount"), gstTotal: sum("gst"), grandTotal: sum("total") };
+  return {
+    lines,
+    subtotal,
+    discountTotal: sum("discount"),
+    gstTotal: sum("gst"),
+    grandTotal: sum("total"),
+  };
 }
 
 function discountPerNight(amounts: number[], subtotal: number, promo?: Discount): number[] {

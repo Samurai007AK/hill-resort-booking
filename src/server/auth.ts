@@ -9,9 +9,10 @@ export { signSession, verifySession, type Session };
 
 /** The user for these credentials, or null. Same answer for an unknown email and a wrong password. */
 export async function authenticate(email: string, password: string): Promise<Session | null> {
-  const { rows } = await pool.query("SELECT id, email, name, role, team, password_hash FROM users WHERE email = $1", [
-    email.trim().toLowerCase(),
-  ]);
+  const { rows } = await pool.query(
+    "SELECT id, email, name, role, team, password_hash FROM users WHERE email = $1",
+    [email.trim().toLowerCase()],
+  );
   const u = rows[0];
   if (!u || !(await bcrypt.compare(password, u.password_hash))) return null;
   return { userId: u.id, email: u.email, name: u.name, role: u.role, team: u.team };

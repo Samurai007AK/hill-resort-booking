@@ -1,9 +1,14 @@
 // Signed session cookie (HS256). No database access here, so the proxy can import it cheaply.
 import { jwtVerify, SignJWT } from "jose";
-import type { Role, Team } from "@/domain/access";
+import { z } from "zod";
 import { secret } from "./secrets";
 
-export type Session = { userId: string; email: string; name: string; role: Role; team: Team | null };
+const fields = { userId: z.string().min(1), email: z.email(), name: z.string().min(1) };
+const SessionPayload = z.union([
+  z.object({ ...fields, role: z.literal("staff"), team: z.enum(["reservations", "sales"]) }),
+  z.object({ ...fields, role: z.enum(["guest", "gm"]), team: z.null() }),
+]);
+export type Session = z.infer<typeof SessionPayload>;
 
 export const SESSION_COOKIE = "session";
 export const SESSION_HOURS = 8;
@@ -23,8 +28,7 @@ export async function verifySession(token: string | undefined): Promise<Session 
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, key(), { algorithms: ["HS256"] });
-    const { userId, email, name, role, team } = payload as unknown as Session;
-    return { userId, email, name, role, team };
+    return SessionPayload.parse(payload);
   } catch {
     return null;
   }

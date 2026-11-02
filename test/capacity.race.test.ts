@@ -16,14 +16,18 @@ async function holdRooms(client: pg.Client, stay: Stay) {
      FROM inventory_night n WHERE n.room_type_id = $1 AND n.night = $2`,
     [stay.roomTypeId, stay.checkIn],
   );
-  if (rows[0].free < (stay.qty ?? 1)) throw Object.assign(new Error("sold out (app check)"), { code: "APP" });
+  if (rows[0].free < (stay.qty ?? 1))
+    throw Object.assign(new Error("sold out (app check)"), { code: "APP" });
   await client.query("SELECT pg_sleep(0.05)");
   return insertReservation(client, stay);
 }
 
 test("20 guests on 20 separate connections race for the last room: exactly one gets it", async () => {
   const { roomTypeId, ratePlanId } = await makeRoomType([{ night: "2027-01-10", allotment: 1 }]);
-  const clients = Array.from({ length: GUESTS }, () => new pg.Client({ connectionString: process.env.DATABASE_URL }));
+  const clients = Array.from(
+    { length: GUESTS },
+    () => new pg.Client({ connectionString: process.env.DATABASE_URL }),
+  );
   await Promise.all(clients.map((c) => c.connect()));
   try {
     const stay = { roomTypeId, ratePlanId, checkIn: "2027-01-10", checkOut: "2027-01-11" };
