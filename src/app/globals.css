@@ -376,6 +376,9 @@ input[type="checkbox"] {
   font-size: var(--text-sm);
   line-height: 1.5;
 }
+.consent a {
+  white-space: nowrap;
+}
 .checkbox-label input,
 .checkbox input,
 .consent input {
@@ -482,8 +485,7 @@ p.alert {
 .wordmark span {
   margin-top: var(--space-2xs);
   color: var(--color-muted);
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: var(--text-sm);
   letter-spacing: 0;
 }
 .site-nav {
@@ -554,6 +556,9 @@ p.alert {
   inset: 0;
   background: linear-gradient(to top, var(--color-scrim), transparent 75%);
   pointer-events: none;
+}
+.hero :focus-visible {
+  outline-color: var(--color-on-photo);
 }
 .hero-copy {
   position: relative;
@@ -669,6 +674,7 @@ p.alert {
   text-align: right;
 }
 .room-offer .price {
+  font-variant-numeric: tabular-nums;
   color: var(--color-ink);
   font-family: var(--font-display);
   font-size: var(--text-2xl);
@@ -738,7 +744,7 @@ main:has(> .gather:last-child) + .site-footer {
   gap: var(--space-lg);
 }
 .gather-inner > div > p {
-  max-width: 40ch;
+  max-width: 45ch;
 }
 .gather-photo {
   width: 100%;
@@ -1335,9 +1341,7 @@ details[open] > summary {
   border-left: 0;
 }
 .stat h2 {
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  color: var(--color-muted);
+  font-size: var(--text-lg);
   white-space: nowrap;
 }
 .metric {
