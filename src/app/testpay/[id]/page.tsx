@@ -2,14 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { privateBooking } from "@/server/guest/booking-access";
 import { getRoom } from "@/server/guest/catalog";
-import {
-  displayDate,
-  GuestFooter,
-  GuestHeader,
-  money,
-  PriceBreakdown,
-  Stepper,
-} from "@/server/guest/ui";
+import { GuestHeader, money, party, PriceBreakdown, stayDates, Stepper } from "@/server/guest/ui";
 import { PaymentForm } from "./payment-form";
 
 export const dynamic = "force-dynamic";
@@ -33,19 +26,18 @@ export default async function TestPayPage({ params }: { params: Promise<{ id: st
   return (
     <>
       <GuestHeader />
-      <main className="page stack">
-        <Stepper step={3} />
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">ONE LAST STEP</p>
-            <h1>Your stay is almost here.</h1>
-          </div>
-          <span className="badge">TEST MODE · NO REAL CHARGE</span>
+      <main className="container page">
+        <div className="flow-bar">
+          <span className="chip">Test mode, no real charge</span>
+          <Stepper step={3} />
         </div>
+        <header className="page-head">
+          <h1>Your stay is almost here.</h1>
+        </header>
         <div className="checkout-grid">
-          <section className="card stack">
-            <p className="eyebrow">TESTPAY</p>
-            <h2>{money(reservation.quotedTotal)}</h2>
+          <section className="card stack" aria-labelledby="pay-title">
+            <h2 id="pay-title">TestPay</h2>
+            <p className="pay-total">{money(reservation.quotedTotal)}</p>
             <p>
               This gateway simulates a payment. It never asks for card details or moves real money.
             </p>
@@ -59,19 +51,25 @@ export default async function TestPayPage({ params }: { params: Promise<{ id: st
               Back to stays
             </Link>
           </section>
-          <aside className="card stack">
-            <p className="eyebrow">BOOKING {reservation.ref}</p>
-            <h2>{room?.name ?? reservation.roomTypeId}</h2>
-            <p>
-              {displayDate(reservation.checkIn)} – {displayDate(reservation.checkOut)}
-              <br />
-              {reservation.adults} adults, {reservation.children} children · {reservation.qty} rooms
-            </p>
-            <p>
-              {reservation.guestName}
-              <br />
-              {reservation.guestEmail}
-            </p>
+          <aside className="card stack" aria-label="Your booking">
+            <div className="stack">
+              <h2>{room?.name ?? reservation.roomTypeId}</h2>
+              <p className="meta">Booking {reservation.ref}</p>
+              <p>
+                {stayDates(reservation.checkIn, reservation.checkOut)}
+                <br />
+                {party({
+                  adults: reservation.adults,
+                  children: reservation.children,
+                  qty: reservation.qty,
+                })}
+              </p>
+              <p>
+                {reservation.guestName}
+                <br />
+                {reservation.guestEmail}
+              </p>
+            </div>
             <PriceBreakdown quote={quote} qty={reservation.qty} />
             <p className="muted small">
               Your contact details are visible only in this browser session and to authorised resort
@@ -80,7 +78,6 @@ export default async function TestPayPage({ params }: { params: Promise<{ id: st
           </aside>
         </div>
       </main>
-      <GuestFooter />
     </>
   );
 }

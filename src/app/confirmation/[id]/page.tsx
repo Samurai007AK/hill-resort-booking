@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { privateBooking } from "@/server/guest/booking-access";
 import { getRoom } from "@/server/guest/catalog";
-import { displayDate, GuestFooter, GuestHeader, money } from "@/server/guest/ui";
+import { displayDate, GuestHeader, money, party } from "@/server/guest/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -12,18 +12,22 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
   return (
     <>
       <GuestHeader />
-      <main className="page narrow stack">
-        <section className="card stack confirmation-card">
-          <span className="badge">
-            {confirmed
-              ? "BOOKING CONFIRMED"
-              : reservation.status === "refund_due"
-                ? "REFUND DUE"
-                : reservation.status === "held"
-                  ? "PAYMENT PENDING"
-                  : "BOOKING CANCELLED"}
-          </span>
-          <p className="eyebrow">{reservation.ref}</p>
+      <main className="container page narrow">
+        <section className="stack confirmation">
+          <p className="meta">
+            <span className={confirmed ? "chip positive" : "chip alert"}>
+              {confirmed
+                ? "Booking confirmed"
+                : reservation.status === "refund_due"
+                  ? "Refund due"
+                  : reservation.status === "held"
+                    ? "Payment pending"
+                    : "Booking cancelled"}
+            </span>
+            <span>
+              Reference <strong>{reservation.ref}</strong>
+            </span>
+          </p>
           <h1>
             {confirmed
               ? "The hills are calling."
@@ -31,7 +35,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
                 ? "We couldn’t confirm your room."
                 : "Your booking update."}
           </h1>
-          <p>
+          <p className="lead">
             {confirmed
               ? `Thank you, ${reservation.guestName}. Your test booking is confirmed. Keep this reference for check-in.`
               : reservation.status === "refund_due"
@@ -40,7 +44,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
                   ? "Your room is held, but the test payment is still needed."
                   : "This booking is no longer active."}
           </p>
-          <dl className="price-totals">
+          <dl className="confirm-details">
             <div>
               <dt>Stay</dt>
               <dd>{room?.name ?? reservation.roomTypeId}</dd>
@@ -55,9 +59,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
             </div>
             <div>
               <dt>Your group</dt>
-              <dd>
-                {reservation.adults} adults, {reservation.children} children
-              </dd>
+              <dd>{party({ adults: reservation.adults, children: reservation.children })}</dd>
             </div>
             <div>
               <dt>Rooms</dt>
@@ -74,7 +76,7 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
             </p>
           )}
           {confirmed && (
-            <div className="card">
+            <section className="arrive stack">
               <h2>Before you arrive</h2>
               <p>
                 Foreign guests provide passport and Form C details at check-in. We never collect
@@ -84,19 +86,20 @@ export default async function ConfirmationPage({ params }: { params: Promise<{ i
                 This confirmation is available in this browser for twenty-four hours. Please save
                 your reference.
               </p>
-            </div>
+            </section>
           )}
-          {reservation.status === "held" && (
-            <Link className="button" href={`/testpay/${reservation.id}`}>
-              Continue to TestPay ↗
+          <div className="actions">
+            {reservation.status === "held" && (
+              <Link className="button" href={`/testpay/${reservation.id}`}>
+                Continue to TestPay
+              </Link>
+            )}
+            <Link className="button secondary" href="/">
+              Explore another stay
             </Link>
-          )}
-          <Link className="button secondary" href="/">
-            Explore another stay
-          </Link>
+          </div>
         </section>
       </main>
-      <GuestFooter />
     </>
   );
 }

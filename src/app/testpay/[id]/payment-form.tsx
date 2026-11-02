@@ -8,14 +8,26 @@ export function PaymentForm({ id }: { id: string }) {
   return (
     <form action={action} className="stack">
       <input type="hidden" name="id" value={id} />
-      <button className="button" name="mode" value="pay" disabled={pending}>
-        {pending ? "Processing test payment…" : "Pay successfully ↗"}
+      <button className="button" type="submit" name="mode" value="pay" disabled={pending}>
+        {pending ? "Processing test payment…" : "Pay successfully"}
       </button>
       <div className="button-row">
-        <button className="button secondary" name="mode" value="fail" disabled={pending}>
+        <button
+          className="button secondary"
+          type="submit"
+          name="mode"
+          value="fail"
+          disabled={pending}
+        >
           Simulate failed payment
         </button>
-        <button className="button secondary" name="mode" value="late" disabled={pending}>
+        <button
+          className="button secondary"
+          type="submit"
+          name="mode"
+          value="late"
+          disabled={pending}
+        >
           Pay after hold expires
         </button>
       </div>

@@ -350,6 +350,11 @@ textarea:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
+input:not([type="checkbox"]):not([type="hidden"]),
+select {
+  height: var(--control);
+  padding-block: 0;
+}
 textarea {
   min-height: 130px;
   resize: vertical;
@@ -1118,6 +1123,9 @@ th.amount {
 .app .card {
   padding: var(--space-lg);
 }
+.app .stack > button {
+  align-self: flex-start;
+}
 .app-head {
   display: flex;
   flex-wrap: wrap;
@@ -1251,10 +1259,6 @@ th.amount {
 .enquiry-list p {
   font-size: var(--text-sm);
 }
-.enquiry-detail {
-  position: sticky;
-  top: var(--space-md);
-}
 blockquote {
   padding: var(--space-md) var(--space-lg);
   border-left: 2px solid var(--color-rule);
@@ -1296,6 +1300,10 @@ details[open] > summary {
   padding-block: var(--space-sm);
   border-bottom: var(--rule);
   font-size: var(--text-sm);
+}
+.sticky-first th,
+.sticky-first td {
+  white-space: nowrap;
 }
 .sticky-first th:first-child,
 .sticky-first td:first-child {
@@ -1417,8 +1425,7 @@ details[open] > summary {
   .stat-row {
     grid-template-columns: minmax(0, 1fr);
   }
-  .split > header,
-  .enquiry-detail {
+  .split > header {
     position: static;
   }
   .stat {
