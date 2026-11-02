@@ -13,8 +13,10 @@ import {
   redactPersonalData,
   isInjection,
   decideLane,
+  screenAiResponse,
   validateAiResponse,
 } from "@/domain/enquiry/pipeline";
+import liveResponses from "../../../eval/live-responses.json";
 import { classifyWithProvider, DEFAULT_MODEL, PROMPT_VERSION } from "./provider";
 import { makeDraft } from "./draft";
 export { Lane } from "@/domain/enquiry/pipeline";
@@ -339,6 +341,18 @@ export async function rerunEnquiry(
   });
 }
 
+const SIMULATED_FAILURES = new Set(["ENQ-4419", "ENQ-4439"]);
+const RecordedRun = z.object({
+  saved: z.array(z.object({ id: z.string(), model: z.string().nullable(), response: z.unknown() })),
+});
+const recordedRun = RecordedRun.safeParse(liveResponses);
+function recordedAnswer(id: string, redacted: string) {
+  const saved = recordedRun.success ? recordedRun.data.saved.find((s) => s.id === id) : undefined;
+  if (!saved?.model || !saved.response) return null;
+  const screened = screenAiResponse(saved.response, redacted);
+  return screened.ok ? { model: saved.model, response: screened.response } : null;
+}
+
 export async function seedEnquiries(client: ClientBase): Promise<void> {
   await client.query("TRUNCATE enquiry_event,enquiry");
   await client.query("SELECT setval('enquiry_seq',4442,false)");
@@ -346,7 +360,15 @@ export async function seedEnquiries(client: ClientBase): Promise<void> {
     "INSERT INTO settings(key,value) VALUES('ai_enabled','true') ON CONFLICT(key) DO UPDATE SET value='true'",
   );
   for (const item of EVAL_SET) {
-    const { redacted, keyword, extracted, status, response, model } = demoFixture(item);
+    const fixture = demoFixture(item);
+    const { redacted, keyword } = fixture;
+    // Prefer the real recorded model answer, so the demo inbox is exactly what eval measured.
+    // ENQ-4419 and ENQ-4439 stay as the simulated outage and AI-off examples.
+    const recorded = SIMULATED_FAILURES.has(item.id) ? null : recordedAnswer(item.id, redacted);
+    const status = recorded ? "ok" : fixture.status;
+    const response = recorded?.response ?? fixture.response;
+    const extracted = response?.extracted ?? fixture.extracted;
+    const model = recorded ? `${recorded.model} (recorded run)` : fixture.model;
     const route = decideLane({
       keyword,
       extracted,
@@ -360,9 +382,12 @@ export async function seedEnquiries(client: ClientBase): Promise<void> {
       response,
       status,
       model,
-      reason: `Demo fixture; ${route.reason}`,
+      reason: recorded ? route.reason : `Demo fixture; ${route.reason}`,
       route,
-      draftTemplate: null,
+      draftTemplate:
+        response && !isInjection(redacted) && response.category === route.category
+          ? response.reply_template
+          : null,
     };
     await insertEnquiry(
       client,

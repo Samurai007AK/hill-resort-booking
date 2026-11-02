@@ -39,10 +39,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "wedding",
-      "lane": "unsorted",
+      "lane": "events",
       "owner_team": "sales",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -139,10 +139,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "offsite",
-      "lane": "unsorted",
+      "lane": "events",
       "owner_team": "sales",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -293,10 +293,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "room",
-      "lane": "unsorted",
+      "lane": "rooms",
       "owner_team": "reservations",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -734,10 +734,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "wedding",
-      "lane": "unsorted",
+      "lane": "events",
       "owner_team": "sales",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -826,10 +826,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "wedding",
-      "lane": "unsorted",
+      "lane": "events",
       "owner_team": "sales",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -980,10 +980,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "offsite",
-      "lane": "unsorted",
+      "lane": "events",
       "owner_team": "sales",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -1026,10 +1026,10 @@
     "model": "demo fixture / keyword baseline (not a live model response)",
     "route": {
       "category": "offsite",
-      "lane": "unsorted",
+      "lane": "events",
       "owner_team": "sales",
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree; needs dates or guest count from the guest"
     }
   },
   {
@@ -1468,7 +1468,7 @@
       "lane": "unsorted",
       "owner_team": null,
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree"
     }
   },
   {
@@ -1506,7 +1506,7 @@
       "lane": "unsorted",
       "owner_team": null,
       "gm_alert": false,
-      "reason": "Missing dates or guest count; staff review needed"
+      "reason": "AI and keyword checks agree"
     }
   }
 ]

@@ -1,0 +1,715 @@
+{
+  "prompt_version": "enquiry-v1",
+  "recorded_at": "2026-11-02T12:36:46.862Z",
+  "saved": [
+    {
+      "id": "ENQ-4410",
+      "model": "free/qwen-3.8-max",
+      "ms": 3249,
+      "response": {
+        "category": "wedding",
+        "confidence": 0.95,
+        "extracted": {
+          "check_in": {
+            "month": 2,
+            "day": null,
+            "year": 2027
+          },
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": 250,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Thank you for your enquiry regarding your sister's wedding. Our team would be delighted to assist with your special occasion. Please share a few more details so we can explore the best options for your event."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4411",
+      "model": "free/qwen-3.8-max",
+      "ms": 1771,
+      "response": {
+        "category": "room",
+        "confidence": 0.92,
+        "extracted": {
+          "check_in": {
+            "month": 11,
+            "day": 14,
+            "year": null
+          },
+          "check_out": {
+            "month": 11,
+            "day": 16,
+            "year": null
+          },
+          "adults": 2,
+          "children": null,
+          "guests_total": 3,
+          "budget_inr": null,
+          "room_type": "pool-villa"
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4412",
+      "model": "gpt-oss:120b",
+      "ms": 4619,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.99,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": 45,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "We’d be delighted to host your team of {{GUESTS}} for an offsite in January. Please let us know your preferred dates so we can check {{AVAILABILITY}} and discuss the conference hall options."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4413",
+      "model": "free/qwen-3.8-max",
+      "ms": 2852,
+      "response": {
+        "category": "room",
+        "confidence": 0.92,
+        "extracted": {
+          "check_in": {
+            "month": 11,
+            "day": 21,
+            "year": null
+          },
+          "check_out": {
+            "month": 11,
+            "day": 23,
+            "year": null
+          },
+          "adults": 2,
+          "children": 1,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": "pool-villa"
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4414",
+      "model": "free/qwen-3.8-max",
+      "ms": 2523,
+      "response": {
+        "category": "room",
+        "confidence": 0.97,
+        "extracted": {
+          "check_in": {
+            "month": 12,
+            "day": 24,
+            "year": 2026
+          },
+          "check_out": {
+            "month": 12,
+            "day": 27,
+            "year": 2026
+          },
+          "adults": 4,
+          "children": 2,
+          "guests_total": 6,
+          "budget_inr": null,
+          "room_type": "plantation-view-room"
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4415",
+      "model": "gpt-oss:20b",
+      "ms": 19930,
+      "response": {
+        "category": "room",
+        "confidence": 0.95,
+        "extracted": {
+          "check_in": {
+            "month": 12,
+            "day": 5,
+            "year": null
+          },
+          "check_out": null,
+          "adults": 2,
+          "children": null,
+          "guests_total": 2,
+          "budget_inr": 15000,
+          "room_type": "coffee-villa"
+        },
+        "reply_template": "Thank you for your enquiry. We have {{AVAILABILITY}} for your requested dates {{DATES}}. The total cost for {{NIGHTLY}} nights will be {{TOTAL}} including GST of {{GST}}. Please let us know if you would like to proceed."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4416",
+      "model": "free/qwen-3.8-max",
+      "ms": 2374,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.92,
+        "extracted": {
+          "check_in": {
+            "month": 12,
+            "day": 30,
+            "year": null
+          },
+          "check_out": {
+            "month": 1,
+            "day": 2,
+            "year": null
+          },
+          "adults": 60,
+          "children": 15,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": "pool-villa"
+        },
+        "reply_template": "Thank you for reaching out! We'd love to host your family get-together. For groups of this size, our team will reach out directly to discuss availability, group rates, and common area arrangements."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4417",
+      "model": "free/qwen-3.8-max",
+      "ms": 2540,
+      "response": {
+        "category": "room",
+        "confidence": 0.9,
+        "extracted": {
+          "check_in": {
+            "month": 1,
+            "day": 9,
+            "year": 2027
+          },
+          "check_out": {
+            "month": 1,
+            "day": 11,
+            "year": 2027
+          },
+          "adults": 3,
+          "children": 1,
+          "guests_total": 4,
+          "budget_inr": null,
+          "room_type": "family-suite"
+        },
+        "reply_template": "Hii! Thanks for your enquiry. {{DATES}} for {{GUESTS}} in our family suite — {{AVAILABILITY}}. Early check-in requests are noted and we'll do our best to accommodate. {{TOTAL}}, {{GST}}."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4418",
+      "model": "free/qwen-3.8-max",
+      "ms": 2047,
+      "response": {
+        "category": "room",
+        "confidence": 0.88,
+        "extracted": {
+          "check_in": {
+            "month": 11,
+            "day": 28,
+            "year": null
+          },
+          "check_out": {
+            "month": 11,
+            "day": 30,
+            "year": null
+          },
+          "adults": 2,
+          "children": null,
+          "guests_total": 2,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Olá! Seria um prazer organizar uma estadia especial para os seus pais. {{DATES}}, para {{GUESTS}} adulto(s), com um presente personalizado no quarto. Entre em contato para verificarmos a disponibilidade e os detalhes."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4419",
+      "model": "free/qwen-3.8-max",
+      "ms": 2619,
+      "response": {
+        "category": "room",
+        "confidence": 0.9,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": 2,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": "estate-room"
+        },
+        "reply_template": "Agradecemos o seu interesse nos nossos quartos. Para lhe proporcionar as melhores taxas, por favor, indique as datas da sua estadia e quantos adultos e crianças haverá. Um dos nossos colaboradores entrará em contacto consigo em breve."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4420",
+      "model": "gpt-oss:20b",
+      "ms": 16254,
+      "response": {
+        "category": "room",
+        "confidence": 0.95,
+        "extracted": {
+          "check_in": {
+            "month": 2,
+            "day": 3,
+            "year": 2027
+          },
+          "check_out": {
+            "month": 2,
+            "day": 6,
+            "year": 2027
+          },
+          "adults": 2,
+          "children": null,
+          "guests_total": 2,
+          "budget_inr": null,
+          "room_type": "pool-villa"
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4421",
+      "model": null,
+      "ms": 20717,
+      "response": null,
+      "failure": "AI unavailable (free/qwen-3.8-max: answer was not JSON; gpt-oss:120b: malformed answer: extracted.check_in.month; beam: timed out; gpt-oss:20b: timed out)"
+    },
+    {
+      "id": "ENQ-4422",
+      "model": "free/qwen-3.8-max",
+      "ms": 1639,
+      "response": {
+        "category": "room",
+        "confidence": 0.9,
+        "extracted": {
+          "check_in": {
+            "month": 11,
+            "day": 26,
+            "year": null
+          },
+          "check_out": {
+            "month": 11,
+            "day": 28,
+            "year": null
+          },
+          "adults": 2,
+          "children": null,
+          "guests_total": 2,
+          "budget_inr": null,
+          "room_type": "estate-room"
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4423",
+      "model": "gpt-oss:120b",
+      "ms": 4982,
+      "response": {
+        "category": "wedding",
+        "confidence": 0.99,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": 150,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Thank you for considering us for your wedding celebrations. We would be delighted to host your special days. Please find the estimated cost breakdown below: Total: {{TOTAL}}, Nightly Rate: {{NIGHTLY}}, GST: {{GST}}. The proposed dates are {{DATES}} and we can accommodate {{GUESTS}} guests. Kindly let us know your preferred {{AVAILABILITY}}."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4424",
+      "model": "free/qwen-3.8-max",
+      "ms": 2556,
+      "response": {
+        "category": "wedding",
+        "confidence": 0.96,
+        "extracted": {
+          "check_in": {
+            "month": 4,
+            "day": null,
+            "year": 2027
+          },
+          "check_out": null,
+          "adults": 300,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": 2500000,
+          "room_type": null
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4425",
+      "model": "free/qwen-3.8-max",
+      "ms": 2913,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.95,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": 60,
+          "children": null,
+          "guests_total": 60,
+          "budget_inr": 200000,
+          "room_type": null
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4426",
+      "model": "gpt-oss:120b",
+      "ms": 3414,
+      "response": {
+        "category": "wedding",
+        "confidence": 0.99,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Thank you for your interest in hosting a wedding with us. Could you please share the preferred dates {{DATES}} and the expected number of guests {{GUESTS}}? This will allow us to check availability {{AVAILABILITY}} and provide you with a detailed proposal."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4427",
+      "model": null,
+      "ms": 19565,
+      "response": null,
+      "failure": "AI unavailable (free/qwen-3.8-max: answer was not JSON; gpt-oss:120b: malformed answer: extracted.check_in.month; beam: malformed answer: extracted.check_in.month; gpt-oss:20b: timed out)"
+    },
+    {
+      "id": "ENQ-4428",
+      "model": null,
+      "ms": 21162,
+      "response": null,
+      "failure": "AI unavailable (free/qwen-3.8-max: answer was not JSON; gpt-oss:120b: malformed answer: extracted.check_in.month; beam: timed out; gpt-oss:20b: timed out)"
+    },
+    {
+      "id": "ENQ-4429",
+      "model": "free/qwen-3.8-max",
+      "ms": 2681,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.94,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4430",
+      "model": "gpt-oss:120b",
+      "ms": 4364,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.99,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": 60,
+          "children": null,
+          "guests_total": 60,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Thank you for your interest in an off‑site event with us. We’ll check {{AVAILABILITY}} for a hall and the requested activities for {{GUESTS}} guests during {{DATES}}. Once we have the details, we’ll provide the total cost breakdown ({{TOTAL}}), nightly rates ({{NIGHTLY}}) and applicable taxes ({{GST}})."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4431",
+      "model": "gpt-oss:120b",
+      "ms": 7446,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.97,
+        "extracted": {
+          "check_in": {
+            "month": 12,
+            "day": 12,
+            "year": null
+          },
+          "check_out": {
+            "month": 12,
+            "day": 13,
+            "year": null
+          },
+          "adults": 18,
+          "children": null,
+          "guests_total": 18,
+          "budget_inr": 15000,
+          "room_type": null
+        },
+        "reply_template": "Thank you for your enquiry. We have availability for your dates {{DATES}} for a group of {{GUESTS}}. Our team will follow up shortly with details on meeting spaces, solid wifi, and trekking options. {{AVAILABILITY}}"
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4432",
+      "model": "free/qwen-3.8-max",
+      "ms": 2043,
+      "response": {
+        "category": "offsite",
+        "confidence": 0.95,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": 40,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4433",
+      "model": "gpt-oss:120b",
+      "ms": 3209,
+      "response": {
+        "category": "complaint",
+        "confidence": 0.99,
+        "extracted": {
+          "check_in": {
+            "month": 10,
+            "day": 25,
+            "year": null
+          },
+          "check_out": {
+            "month": 10,
+            "day": 27,
+            "year": null
+          },
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "We apologise for the inconvenience you experienced. {{DATES}} {{GUESTS}} Our team will review the matter and contact you shortly."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4434",
+      "model": "gpt-oss:120b",
+      "ms": 4470,
+      "response": {
+        "category": "complaint",
+        "confidence": 1,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "We’re sorry to hear about the extra charge on your bill. Our team will investigate the issue and get back to you regarding {{TOTAL}}. Thank you for bringing this to our attention."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4435",
+      "model": "free/qwen-3.8-max",
+      "ms": 1931,
+      "response": {
+        "category": "complaint",
+        "confidence": 0.97,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "We sincerely apologise for the distressing experience during your family's wedding. This is unacceptable, and we are escalating it immediately. A senior member of our management team will contact you directly as soon as possible to address every concern you have raised."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4436",
+      "model": "free/qwen-3.8-max",
+      "ms": 1904,
+      "response": {
+        "category": "complaint",
+        "confidence": 0.98,
+        "extracted": {
+          "check_in": {
+            "month": 11,
+            "day": 7,
+            "year": null
+          },
+          "check_out": {
+            "month": 11,
+            "day": 9,
+            "year": null
+          },
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": "coffee-villa"
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4437",
+      "model": "free/qwen-3.8-max",
+      "ms": 2546,
+      "response": {
+        "category": "complaint",
+        "confidence": 0.98,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "We are deeply sorry for this distressing experience. This is unacceptable, and your family's well-being is our priority. Please share your contact details so our team can reach out to you immediately to make this right."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4438",
+      "model": "free/qwen-3.8-max",
+      "ms": 2144,
+      "response": {
+        "category": "complaint",
+        "confidence": 0.96,
+        "extracted": {
+          "check_in": {
+            "month": 10,
+            "day": 29,
+            "year": null
+          },
+          "check_out": {
+            "month": 10,
+            "day": 31,
+            "year": null
+          },
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": "pool-villa"
+        },
+        "reply_template": "Dear Revathi, we are truly sorry that your Pool Villa experience fell short of our standards. We take this feedback seriously and are following up on the issue immediately. We would love the opportunity to make it right."
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4439",
+      "model": "free/qwen-3.8-max",
+      "ms": 1637,
+      "response": {
+        "category": "other",
+        "confidence": 0.9,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": null
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4440",
+      "model": "free/qwen-3.8-max",
+      "ms": 2702,
+      "response": {
+        "category": "other",
+        "confidence": 0.65,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Thank you for reaching out. We'd be happy to connect with your team — how would you prefer to schedule a brief introductory call?"
+      },
+      "failure": null
+    },
+    {
+      "id": "ENQ-4441",
+      "model": "free/qwen-3.8-max",
+      "ms": 1742,
+      "response": {
+        "category": "other",
+        "confidence": 0.92,
+        "extracted": {
+          "check_in": null,
+          "check_out": null,
+          "adults": null,
+          "children": null,
+          "guests_total": null,
+          "budget_inr": null,
+          "room_type": null
+        },
+        "reply_template": "Thank you for your interest in joining our team. We appreciate your qualifications and have received your application. Our recruitment team will review it and contact you if there is a suitable match."
+      },
+      "failure": null
+    }
+  ]
+}

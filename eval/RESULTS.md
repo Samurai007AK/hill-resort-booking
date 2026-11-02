@@ -35,20 +35,20 @@ Nulls are scored too. Date month/day must match; year is scored only when the la
 
 ## Synthetic confidence threshold sweep
 
-The lane policy additionally requires AI/rule agreement, complete required fields, availability of the model, and no injection. This table is an interface exercise, not evidence for a production confidence cutoff. Current cutoff 0.95 is a conservative assumption and must be recalibrated with independently recorded live-model outputs.
+The lane policy additionally requires AI/rule agreement, complete required fields, availability of the model, and no injection. This table is an interface exercise, not evidence for a production confidence cutoff. Current cutoff 0.85 is a conservative assumption and must be recalibrated with independently recorded live-model outputs.
 
 | Minimum confidence | Auto-routed fixtures | Category accuracy |
 |---|---|---|
-| 0.50 | 19 | 100.0% (19/19) |
-| 0.55 | 19 | 100.0% (19/19) |
-| 0.60 | 19 | 100.0% (19/19) |
-| 0.65 | 19 | 100.0% (19/19) |
-| 0.70 | 18 | 100.0% (18/18) |
-| 0.75 | 18 | 100.0% (18/18) |
-| 0.80 | 18 | 100.0% (18/18) |
-| 0.85 | 18 | 100.0% (18/18) |
-| 0.90 | 18 | 100.0% (18/18) |
-| 0.95 | 18 | 100.0% (18/18) |
+| 0.50 | 26 | 100.0% (26/26) |
+| 0.55 | 26 | 100.0% (26/26) |
+| 0.60 | 26 | 100.0% (26/26) |
+| 0.65 | 26 | 100.0% (26/26) |
+| 0.70 | 25 | 100.0% (25/25) |
+| 0.75 | 25 | 100.0% (25/25) |
+| 0.80 | 25 | 100.0% (25/25) |
+| 0.85 | 25 | 100.0% (25/25) |
+| 0.90 | 25 | 100.0% (25/25) |
+| 0.95 | 25 | 100.0% (25/25) |
 
 ## Prompt injection checks
 
