@@ -3,7 +3,7 @@ import { pool } from "@/db/pool";
 
 afterAll(() => pool.end());
 
-test("test database is reachable and migrated", async () => {
-  const { rows } = await pool.query("SELECT count(*)::int AS n FROM schema_migrations");
-  expect(rows[0].n).toBeGreaterThanOrEqual(0);
+test("migrations created the core tables", async () => {
+  const { rows } = await pool.query("SELECT to_regclass('reservation') AS r, to_regclass('inventory_night') AS n");
+  expect(rows[0]).toEqual({ r: "reservation", n: "inventory_night" });
 });
