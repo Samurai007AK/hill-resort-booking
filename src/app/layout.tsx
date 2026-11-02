@@ -1,16 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Coffee Estate Resort, Chikkamagaluru",
@@ -19,11 +9,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className="h-full antialiased">
+      <body className="min-h-full flex flex-col">
+        {children}
+        <footer className="app-footer">
+          <Link href="/">Silver Oaks</Link>
+          <Link href="/enquire">Contact & events</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/login">Team sign in</Link>
+        </footer>
+      </body>
     </html>
   );
 }
