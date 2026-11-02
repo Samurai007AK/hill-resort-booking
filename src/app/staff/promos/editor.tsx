@@ -19,11 +19,14 @@ export function PromoEditor({ promo, today }: { promo?: Promo; today: string }) 
     <form action={action} className="card stack">
       <h3>{promo ? promo.code : "Create a promo"}</h3>
       {promo && (
-        <p>
-          {promo.uses} recorded uses · {promo.active ? "Active" : "Paused"}
+        <p className="meta">
+          <span>{promo.uses} recorded uses</span>
+          <span className={promo.active ? "chip positive" : "chip"}>
+            {promo.active ? "Active" : "Paused"}
+          </span>
         </p>
       )}
-      <div className="grid">
+      <div className="form-grid">
         <label>
           Code
           <input
@@ -74,7 +77,7 @@ export function PromoEditor({ promo, today }: { promo?: Promo; today: string }) 
           />
         </label>
         <label>
-          Maximum uses · blank for unlimited
+          Maximum uses (blank for unlimited)
           <input
             name="maxUses"
             type="number"

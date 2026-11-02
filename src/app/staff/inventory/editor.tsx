@@ -15,12 +15,11 @@ export function InventoryEditor({
   });
   return (
     <form className="card stack" action={action}>
-      <div>
-        <span className="eyebrow">DAILY OR BULK EDIT</span>
+      <div className="screen-head">
         <h2>Set the nights ahead.</h2>
-        <p>Both dates are included. Changes apply together or not at all.</p>
+        <p>Daily or bulk edit. Both dates are included. Changes apply together or not at all.</p>
       </div>
-      <div className="grid">
+      <div className="form-grid five">
         <label>
           Room type
           <select name="roomTypeId" required>
@@ -40,7 +39,7 @@ export function InventoryEditor({
           <input name="to" type="date" defaultValue={date} required />
         </label>
         <label>
-          Nightly tariff · INR
+          Nightly tariff (INR)
           <input
             name="rate"
             type="number"
