@@ -37,3 +37,7 @@ The brief does not say these things, so they are decided here. Each one is numbe
 **A17. Limited promos.** Promo usage is claimed atomically when payment confirms. If competing held bookings exhaust a promo before payment, the losing paid booking becomes refund due and releases its rooms. The demo does not silently charge a different total.
 
 **A18. Type.** Headings use one web face, Newsreader (light and regular, Latin only), which Next.js serves from the site itself; text is shown at once in a metric-matched serif fallback while it loads. Body text, forms and staff tables keep the system face. This replaces the font line in A16.
+
+**A19. Large events.** A party above 152 guests (two guests per key across 76 keys) cannot all sleep on site. ENQ-4410 asks for about 250 guests, so its draft says the headcount exceeds this working assumption and offers a buyout and nearby stays; accommodation is not confirmed. Event pricing is a staff proposal, never a model or server quote.
+
+**A20. Savings estimate.** The direct-share target (12% to 20% of all room nights) is applied to the brief's 17,199 nights. A payment-gateway fee of about 2% of the direct room value is assumed only to show that net savings are lower than gross commission avoided. No gateway rate is in the brief.
