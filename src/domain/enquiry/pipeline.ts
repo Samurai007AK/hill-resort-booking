@@ -4,7 +4,8 @@ import { Category, DatePart } from "./gold";
 
 export const Lane = z.enum(["unsorted", "rooms", "events", "complaints"]);
 export type Lane = z.infer<typeof Lane>;
-export const AI_CUTOFF = 0.95;
+/** Set from eval/RESULTS-live.md: 0.50–0.85 auto-route the same items at 100%; 0.85 keeps margin. */
+export const AI_CUTOFF = 0.85;
 export const Extraction = z.strictObject({
   check_in: DatePart.nullable(),
   check_out: DatePart.nullable(),
@@ -336,32 +337,35 @@ type DecisionInput = {
   ai: { category: z.infer<typeof Category>; confidence: number } | null;
   status: "ok" | "fallback" | "off";
 };
-function fieldsMissing(category: z.infer<typeof Category>, extracted: Extraction): boolean {
+/** A contradiction needs a person; a merely missing detail is asked for in the reply. */
+type DetailGap = "contradiction" | "missing" | null;
+function detailGap(category: z.infer<typeof Category>, extracted: Extraction): DetailGap {
   if (
     extracted.check_in?.day &&
     extracted.check_out?.day &&
     !resolveDates(extracted.check_in, extracted.check_out, "2000-01-01").checkOut
   )
-    return true;
+    return "contradiction";
   switch (category) {
     case "room":
-      return !extracted.check_in?.day || !extracted.check_out?.day || !extracted.guests_total;
+      return !extracted.check_in?.day || !extracted.check_out?.day || !extracted.guests_total
+        ? "missing"
+        : null;
     case "wedding":
     case "offsite":
-      return !extracted.check_in?.day || !extracted.guests_total;
+      return !extracted.check_in?.day || !extracted.guests_total ? "missing" : null;
     case "complaint":
-      return false;
     case "other":
-      return true;
+      return null;
   }
 }
-function reviewReason(input: DecisionInput, missing: boolean, cutoff: number): string | null {
+function reviewReason(input: DecisionInput, gap: DetailGap, cutoff: number): string | null {
   if (input.injection) return "Message contains instruction-like text; staff review needed";
   if (input.status === "off") return "AI switched off; keyword fallback requires review";
   if (input.status !== "ok" || !input.ai) return "AI unavailable; keyword fallback requires review";
   if (input.ai.category !== input.keyword) return "AI and keyword classification disagree";
   if (input.ai.confidence < cutoff) return "Low model confidence";
-  if (missing) return "Missing dates or guest count; staff review needed";
+  if (gap === "contradiction") return "Departure is not after arrival; staff review needed";
   return null;
 }
 const ownerByCategory = {
@@ -391,14 +395,19 @@ export function decideLane(
   const category = input.ai?.category ?? input.keyword;
   const complaint = category === "complaint" || input.keyword === "complaint";
   const finalCategory = complaint ? "complaint" : category;
-  const reason = reviewReason(input, fieldsMissing(category, input.extracted), cutoff);
+  const gap = detailGap(category, input.extracted);
+  const reason = reviewReason(input, gap, cutoff);
   const lane: Lane = reason ? "unsorted" : laneByCategory[finalCategory];
   return {
     category: finalCategory,
     lane,
     owner_team: ownerByCategory[finalCategory],
     gm_alert: complaint || input.status !== "ok",
-    reason: reason ?? "AI and keyword checks agree",
+    reason:
+      reason ??
+      (gap === "missing"
+        ? "AI and keyword checks agree; needs dates or guest count from the guest"
+        : "AI and keyword checks agree"),
   };
 }
 

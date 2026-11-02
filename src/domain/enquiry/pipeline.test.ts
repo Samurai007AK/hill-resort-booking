@@ -226,3 +226,18 @@ describe("screenAiResponse keeps a sound classification and drops only the unsaf
     expect(screenAiResponse({ ...good, confidence: 3 }, text).ok).toBe(false);
   });
 });
+
+describe("missing details route to the right team, not to Unsorted", () => {
+  test("an agreed room enquiry without dates goes to Rooms, flagged for details", () => {
+    const text = "Do you have a family room? We are 4 people.";
+    const route = decideLane({
+      keyword: "room",
+      extracted: extractKeywords(text),
+      injection: false,
+      ai: { category: "room", confidence: 0.97 },
+      status: "ok",
+    });
+    expect(route.lane).toBe("rooms");
+    expect(route.reason).toMatch(/needs dates or guest count/i);
+  });
+});
